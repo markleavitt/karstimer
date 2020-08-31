@@ -1,6 +1,3 @@
-//  Copyright (c) 2018 Loup Inc.
-//  Licensed under Apache License v2.0
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -51,17 +48,17 @@ class _TabSettingsState extends State<TabSettings> {
       ),
       body: new ListView(
         children: ListTile.divideTiles(context: context, tiles: [
-          new _Item(
-            title: 'Is location operational',
-            successLabel: 'Yes',
-            result: _locationOperationalResult,
-            onPressed: _checkLocationOperational,
-          ),
-          new _Item(
-            title: 'Request permission',
+          _Item(
+            title: 'Geolocator permission',
             successLabel: 'Granted',
             result: _requestPermissionResult,
             onPressed: _requestPermission,
+          ),
+          _Item(
+            title: 'Geolocator operational',
+            successLabel: 'Yes',
+            result: _locationOperationalResult,
+            onPressed: _checkLocationOperational,
           ),
         ]).toList(),
       ),
@@ -144,7 +141,7 @@ class _Item extends StatelessWidget {
       ),
     ];
 
-    return new GestureDetector(
+    return GestureDetector(
       onTap: onPressed,
       child: new Container(
         color: Colors.white,

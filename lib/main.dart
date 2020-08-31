@@ -5,11 +5,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocation/geolocation.dart';
-import 'tab_location.dart';
 import 'tab_track.dart';
+import 'tab_lap_timer.dart';
 import 'tab_settings.dart';
-
-Icon statusIcon = Icon(Icons.location_off);
 
 void main() => runApp(MyApp());
 
@@ -35,12 +33,12 @@ class _MyAppState extends State<MyApp> {
         tabBar: CupertinoTabBar(
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-              title: Text('Map Track'),
-              icon: statusIcon,
+              title: Text('Lap Timer'),
+              icon: Icon(Icons.timer),
             ),
             BottomNavigationBarItem(
-              title: Text('Lap Times'),
-              icon: Icon(Icons.timer),
+              title: Text('Track'),
+              icon: Icon(Icons.location_on),
             ),
             BottomNavigationBarItem(
               title: Text('Settings'),
@@ -53,7 +51,7 @@ class _MyAppState extends State<MyApp> {
             builder: (BuildContext context) {
               switch (index) {
                 case 0:
-                  return TabLocation();
+                  return TabLapTimer();
                 case 1:
                   return TabTrack();
                 case 2:
@@ -69,11 +67,9 @@ class _MyAppState extends State<MyApp> {
   enableLocationServices() async {
     Geolocation.enableLocationServices().then((result) {
       if (result.isSuccessful == true) {
-        setState(() {
-          statusIcon = Icon(Icons.location_on);
-        });
+        print('Location services enabled');
       }
-      // Location Services Enablind Cancelled
+      // Location Services Enabled
     });
   }
 }
