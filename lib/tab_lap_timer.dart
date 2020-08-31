@@ -1,8 +1,5 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:geolocation/geolocation.dart';
 
 class TabLapTimer extends StatefulWidget {
@@ -19,7 +16,9 @@ class _TabLapTimerState extends State<TabLapTimer> {
   @override
   dispose() {
     super.dispose();
-    _subscription.cancel();
+    if (_subscription != null) {
+      _subscription.cancel();
+    }
   }
 
   _onTogglePressed() {
@@ -64,25 +63,26 @@ class _TabLapTimerState extends State<TabLapTimer> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> children = [
-      _Header(
-        isRunning: _isTracking,
-        onTogglePressed: _onTogglePressed,
-      )
-    ];
-
+    List<Widget> children = [];
     children.addAll(ListTile.divideTiles(
       context: context,
       tiles: _locations.map((location) => _Item(data: location)).toList(),
     ));
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Lap Timer'),
-      ),
-      body: ListView(
-        children: children,
-      ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _Header(
+          isRunning: _isTracking,
+          onTogglePressed: _onTogglePressed,
+        ),
+        Expanded(
+          child: ListView(
+            children: children,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -99,8 +99,8 @@ class _Header extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 20.0),
       child: Center(
         child: _HeaderButton(
-          title: isRunning ? 'Stop' : 'Start',
-          color: isRunning ? Colors.deepOrange : Colors.teal,
+          title: isRunning ? 'STOP' : 'START',
+          color: isRunning ? Colors.red : Colors.green[700],
           onTap: onTogglePressed,
         ),
       ),
@@ -132,7 +132,11 @@ class _HeaderButton extends StatelessWidget {
           ),
           child: Text(
             title,
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 30.0,
+              fontFamily: 'RacingSansOne',
+            ),
           ),
         ),
       ),

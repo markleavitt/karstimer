@@ -2,7 +2,6 @@
 //  Geolocation library Copyright (c) 2018 Loup Inc.
 //  Licensed under Apache License v2.0
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocation/geolocation.dart';
 import 'tab_track.dart';
@@ -29,37 +28,33 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: CupertinoTabScaffold(
-        tabBar: CupertinoTabBar(
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              title: Text('Lap Timer'),
-              icon: Icon(Icons.timer),
+      home: DefaultTabController(
+        length: 3,
+        child: Scaffold(
+            appBar: AppBar(
+              bottom: TabBar(
+                tabs: [
+                  Tab(icon: Icon(Icons.timer, size: 40.0)),
+                  Tab(icon: Icon(Icons.location_on, size: 40.0)),
+                  Tab(icon: Icon(Icons.settings, size: 40.0))
+                ],
+                unselectedLabelColor: Colors.black,
+              ),
+              title: Center(
+                child: Text(
+                  'KarsTimer',
+                  style: TextStyle(
+                    fontSize: 30.0,
+                    fontFamily: 'RacingSansOne',
+                  ),
+                ),
+              ),
             ),
-            BottomNavigationBarItem(
-              title: Text('Track'),
-              icon: Icon(Icons.location_on),
-            ),
-            BottomNavigationBarItem(
-              title: Text('Settings'),
-              icon: Icon(Icons.settings),
-            ),
-          ],
-        ),
-        tabBuilder: (BuildContext context, int index) {
-          return CupertinoTabView(
-            builder: (BuildContext context) {
-              switch (index) {
-                case 0:
-                  return TabLapTimer();
-                case 1:
-                  return TabTrack();
-                case 2:
-                  return TabSettings();
-              }
-            },
-          );
-        },
+            body: TabBarView(children: [
+              TabLapTimer(),
+              TabTrack(),
+              TabSettings(),
+            ])),
       ),
     );
   }
@@ -73,3 +68,36 @@ class _MyAppState extends State<MyApp> {
     });
   }
 }
+
+// CupertinoTabScaffold(
+// tabBar: CupertinoTabBar(
+// items: <BottomNavigationBarItem>[
+// BottomNavigationBarItem(
+// title: Text('Lap Timer'),
+// icon: Icon(Icons.timer),
+// ),
+// BottomNavigationBarItem(
+// title: Text('Track'),
+// icon: Icon(Icons.location_on),
+// ),
+// BottomNavigationBarItem(
+// title: Text('Settings'),
+// icon: Icon(Icons.settings),
+// ),
+// ],
+// ),
+// tabBuilder: (BuildContext context, int index) {
+// return CupertinoTabView(
+// builder: (BuildContext context) {
+// switch (index) {
+// case 0:
+// return TabLapTimer();
+// case 1:
+// return TabTrack();
+// case 2:
+// return TabSettings();
+// }
+// },
+// );
+// },
+// ),
