@@ -14,7 +14,7 @@ class _TabTrackState extends State<TabTrack> {
   List<StreamSubscription<dynamic>> _subscriptions = [];
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text('Future tab for map tracking'));
+    return Center(child: Text('Future tab for tracking'));
   }
 }
 

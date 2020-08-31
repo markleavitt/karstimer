@@ -152,7 +152,7 @@ class _HeaderButton extends StatelessWidget {
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 50.0,
+              fontSize: 40.0,
               fontFamily: 'RacingSansOne',
             ),
           ),
