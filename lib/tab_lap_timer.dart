@@ -97,12 +97,29 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20.0),
-      child: Center(
-        child: _HeaderButton(
-          title: isRunning ? 'STOP' : 'START',
-          color: isRunning ? Colors.red : Colors.green[700],
-          onTap: onTogglePressed,
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Expanded(
+            flex: 1,
+            child: _HeaderButton(
+              title: isRunning ? 'STOP' : 'START',
+              color: isRunning ? Colors.red : Colors.green[700],
+              onTap: onTogglePressed,
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Text(
+              '00:00',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 70.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -132,9 +149,10 @@ class _HeaderButton extends StatelessWidget {
           ),
           child: Text(
             title,
+            textAlign: TextAlign.center,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 30.0,
+              fontSize: 50.0,
               fontFamily: 'RacingSansOne',
             ),
           ),
