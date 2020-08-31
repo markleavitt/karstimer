@@ -39,26 +39,21 @@ class _TabSettingsState extends State<TabSettings> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Settings'),
-      ),
-      body: ListView(
-        children: ListTile.divideTiles(context: context, tiles: [
-          _Item(
-            title: 'Geolocator permission',
-            successLabel: 'Granted',
-            result: _requestPermissionResult,
-            onPressed: _requestPermission,
-          ),
-          _Item(
-            title: 'Geolocator operational',
-            successLabel: 'Yes',
-            result: _locationOperationalResult,
-            onPressed: _checkLocationOperational,
-          ),
-        ]).toList(),
-      ),
+    return ListView(
+      children: ListTile.divideTiles(context: context, tiles: [
+        _Item(
+          title: 'Geolocator permission',
+          successLabel: 'Granted',
+          result: _requestPermissionResult,
+          onPressed: _requestPermission,
+        ),
+        _Item(
+          title: 'Geolocator operational',
+          successLabel: 'Yes',
+          result: _locationOperationalResult,
+          onPressed: _checkLocationOperational,
+        ),
+      ]).toList(),
     );
   }
 }
