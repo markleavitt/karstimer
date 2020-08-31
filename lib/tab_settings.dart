@@ -6,7 +6,7 @@ import 'package:geolocation/geolocation.dart';
 
 class TabSettings extends StatefulWidget {
   @override
-  _TabSettingsState createState() => new _TabSettingsState();
+  _TabSettingsState createState() => _TabSettingsState();
 }
 
 class _TabSettingsState extends State<TabSettings> {
@@ -42,11 +42,11 @@ class _TabSettingsState extends State<TabSettings> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text('Settings'),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Settings'),
       ),
-      body: new ListView(
+      body: ListView(
         children: ListTile.divideTiles(context: context, tiles: [
           _Item(
             title: 'Geolocator permission',
@@ -143,33 +143,33 @@ class _Item extends StatelessWidget {
 
     return GestureDetector(
       onTap: onPressed,
-      child: new Container(
+      child: Container(
         color: Colors.white,
-        child: new SizedBox(
+        child: SizedBox(
           height: 80,
-          child: new Padding(
+          child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: new Row(
+            child: Row(
               mainAxisSize: MainAxisSize.max,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                new Expanded(
-                  child: new Column(
+                Expanded(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: content,
                   ),
                 ),
-                new Container(
+                Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8.0,
                     vertical: 4.0,
                   ),
-                  decoration: new BoxDecoration(
+                  decoration: BoxDecoration(
                     color: color,
-                    borderRadius: new BorderRadius.circular(6.0),
+                    borderRadius: BorderRadius.circular(6.0),
                   ),
-                  child: new Text(
+                  child: Text(
                     status,
                     style: const TextStyle(
                       color: Colors.white,

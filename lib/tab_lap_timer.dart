@@ -7,7 +7,7 @@ import 'package:geolocation/geolocation.dart';
 
 class TabLapTimer extends StatefulWidget {
   @override
-  _TabLapTimerState createState() => new _TabLapTimerState();
+  _TabLapTimerState createState() => _TabLapTimerState();
 }
 
 class _TabLapTimerState extends State<TabLapTimer> {
@@ -36,15 +36,15 @@ class _TabLapTimerState extends State<TabLapTimer> {
         _isTracking = true;
       });
 
-      _subscriptionStartedTimestamp = new DateTime.now().millisecondsSinceEpoch;
+      _subscriptionStartedTimestamp = DateTime.now().millisecondsSinceEpoch;
       _subscription = Geolocation.locationUpdates(
         accuracy: LocationAccuracy.best,
         displacementFilter: 0.0,
         inBackground: false,
       ).listen((result) {
-        final location = new _LocationData(
+        final location = _LocationData(
           result: result,
-          elapsedTimeSeconds: (new DateTime.now().millisecondsSinceEpoch -
+          elapsedTimeSeconds: (DateTime.now().millisecondsSinceEpoch -
                   _subscriptionStartedTimestamp) ~/
               1000,
         );
@@ -65,7 +65,7 @@ class _TabLapTimerState extends State<TabLapTimer> {
   @override
   Widget build(BuildContext context) {
     List<Widget> children = [
-      new _Header(
+      _Header(
         isRunning: _isTracking,
         onTogglePressed: _onTogglePressed,
       )
@@ -73,14 +73,14 @@ class _TabLapTimerState extends State<TabLapTimer> {
 
     children.addAll(ListTile.divideTiles(
       context: context,
-      tiles: _locations.map((location) => new _Item(data: location)).toList(),
+      tiles: _locations.map((location) => _Item(data: location)).toList(),
     ));
 
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text('Lap Timer'),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Lap Timer'),
       ),
-      body: new ListView(
+      body: ListView(
         children: children,
       ),
     );
@@ -95,10 +95,10 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Padding(
+    return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20.0),
-      child: new Center(
-        child: new _HeaderButton(
+      child: Center(
+        child: _HeaderButton(
           title: isRunning ? 'Stop' : 'Start',
           color: isRunning ? Colors.deepOrange : Colors.teal,
           onTap: onTogglePressed,
@@ -118,19 +118,19 @@ class _HeaderButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Padding(
+    return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6.0),
-      child: new GestureDetector(
+      child: GestureDetector(
         onTap: onTap,
-        child: new Container(
+        child: Container(
           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15.0),
-          decoration: new BoxDecoration(
+          decoration: BoxDecoration(
             color: color,
-            borderRadius: new BorderRadius.all(
-              new Radius.circular(6.0),
+            borderRadius: BorderRadius.all(
+              Radius.circular(6.0),
             ),
           ),
-          child: new Text(
+          child: Text(
             title,
             style: const TextStyle(color: Colors.white),
           ),
@@ -184,16 +184,16 @@ class _Item extends StatelessWidget {
     }
 
     final List<Widget> content = <Widget>[
-      new Text(
+      Text(
         text,
         style: const TextStyle(fontSize: 15.0, fontWeight: FontWeight.w500),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-      new SizedBox(
+      SizedBox(
         height: 3.0,
       ),
-      new Text(
+      Text(
         'Elapsed time: ${data.elapsedTimeSeconds == 0 ? '< 1' : data.elapsedTimeSeconds}s',
         style: const TextStyle(fontSize: 12.0, color: Colors.grey),
         maxLines: 1,
@@ -201,33 +201,33 @@ class _Item extends StatelessWidget {
       ),
     ];
 
-    return new Container(
+    return Container(
       color: Colors.white,
-      child: new SizedBox(
+      child: SizedBox(
         height: 56.0,
-        child: new Padding(
+        child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0),
-          child: new Row(
+          child: Row(
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              new Expanded(
-                child: new Column(
+              Expanded(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: content,
                 ),
               ),
-              new Container(
+              Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 8.0,
                   vertical: 4.0,
                 ),
-                decoration: new BoxDecoration(
+                decoration: BoxDecoration(
                   color: color,
-                  borderRadius: new BorderRadius.circular(6.0),
+                  borderRadius: BorderRadius.circular(6.0),
                 ),
-                child: new Text(
+                child: Text(
                   status,
                   style: const TextStyle(
                     color: Colors.white,

@@ -9,7 +9,7 @@ import 'package:geolocation/geolocation.dart';
 
 class TabTrack extends StatefulWidget {
   @override
-  _TabTrackState createState() => new _TabTrackState();
+  _TabTrackState createState() => _TabTrackState();
 }
 
 class _TabTrackState extends State<TabTrack> {
@@ -58,23 +58,23 @@ class _TabTrackState extends State<TabTrack> {
     final int lastId = _locations.isNotEmpty
         ? _locations.map((location) => location.id).reduce(math.max)
         : 0;
-    final int newId = lastId + 1;
+    final int Id = lastId + 1;
 
     setState(() {
       _locations.insert(
         0,
-        new LocationData(
-          id: newId,
+        LocationData(
+          id: Id,
           result: null,
           origin: origin,
           color: color,
-          createdAtTimestamp: new DateTime.now().millisecondsSinceEpoch,
+          createdAtTimestamp: DateTime.now().millisecondsSinceEpoch,
           elapsedTimeSeconds: null,
         ),
       );
     });
 
-    return newId;
+    return Id;
   }
 
   _updateLocation(int id, LocationResult result) {
@@ -84,13 +84,13 @@ class _TabTrackState extends State<TabTrack> {
     final LocationData location = _locations[index];
 
     setState(() {
-      _locations[index] = new LocationData(
+      _locations[index] = LocationData(
         id: location.id,
         result: result,
         origin: location.origin,
         color: location.color,
         createdAtTimestamp: location.createdAtTimestamp,
-        elapsedTimeSeconds: (new DateTime.now().millisecondsSinceEpoch -
+        elapsedTimeSeconds: (DateTime.now().millisecondsSinceEpoch -
                 location.createdAtTimestamp) ~/
             1000,
       );
@@ -100,7 +100,7 @@ class _TabTrackState extends State<TabTrack> {
   @override
   Widget build(BuildContext context) {
     List<Widget> children = [
-      new _Header(
+      _Header(
         onLastKnownPressed: _onLastKnownPressed,
         onCurrentPressed: _onCurrentPressed,
         onSingleUpdatePressed: _onSingleUpdatePressed,
@@ -109,14 +109,14 @@ class _TabTrackState extends State<TabTrack> {
 
     children.addAll(ListTile.divideTiles(
       context: context,
-      tiles: _locations.map((location) => new _Item(data: location)).toList(),
+      tiles: _locations.map((location) => _Item(data: location)).toList(),
     ));
 
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text('Track'),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Track'),
       ),
-      body: new ListView(
+      body: ListView(
         children: children,
       ),
     );
@@ -135,27 +135,27 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Padding(
+    return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20.0),
-      child: new Column(
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          new Row(
+          Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              new _HeaderButton(
+              _HeaderButton(
                 title: 'Last known',
                 color: Colors.blueGrey,
                 onTap: onLastKnownPressed,
               ),
-              new _HeaderButton(
+              _HeaderButton(
                 title: 'Current',
                 color: Colors.lightGreen,
                 onTap: onCurrentPressed,
               ),
-              new _HeaderButton(
+              _HeaderButton(
                 title: 'Single update',
                 color: Colors.deepOrange,
                 onTap: onSingleUpdatePressed,
@@ -178,19 +178,19 @@ class _HeaderButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Padding(
+    return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6.0),
-      child: new GestureDetector(
+      child: GestureDetector(
         onTap: onTap,
-        child: new Container(
+        child: Container(
           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15.0),
-          decoration: new BoxDecoration(
+          decoration: BoxDecoration(
             color: color,
-            borderRadius: new BorderRadius.all(
-              new Radius.circular(6.0),
+            borderRadius: BorderRadius.all(
+              Radius.circular(6.0),
             ),
           ),
-          child: new Text(
+          child: Text(
             title,
             style: const TextStyle(color: Colors.white),
           ),
@@ -239,16 +239,16 @@ class _Item extends StatelessWidget {
       }
 
       content.addAll(<Widget>[
-        new Text(
+        Text(
           text,
           style: const TextStyle(fontSize: 15.0, fontWeight: FontWeight.w500),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        new SizedBox(
+        SizedBox(
           height: 3.0,
         ),
-        new Text(
+        Text(
           'Elapsed time: ${data.elapsedTimeSeconds == 0 ? '< 1' : data.elapsedTimeSeconds}s',
           style: const TextStyle(fontSize: 12.0, color: Colors.grey),
           maxLines: 1,
@@ -256,40 +256,40 @@ class _Item extends StatelessWidget {
         ),
       ]);
     } else {
-      content.add(new Text(
+      content.add(Text(
         'In progress...',
         style: const TextStyle(fontSize: 15.0, fontWeight: FontWeight.w500),
       ));
     }
 
-    return new Container(
-      key: new Key(data.id.toString()),
+    return Container(
+      key: Key(data.id.toString()),
       color: Colors.white,
-      child: new SizedBox(
+      child: SizedBox(
         height: 56.0,
-        child: new Padding(
+        child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0),
-          child: new Row(
+          child: Row(
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              new Expanded(
-                child: new Column(
+              Expanded(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: content,
                 ),
               ),
-              new Container(
+              Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 8.0,
                   vertical: 4.0,
                 ),
-                decoration: new BoxDecoration(
+                decoration: BoxDecoration(
                   color: data.color,
-                  borderRadius: new BorderRadius.circular(6.0),
+                  borderRadius: BorderRadius.circular(6.0),
                 ),
-                child: new Text(
+                child: Text(
                   data.origin,
                   style: const TextStyle(
                     color: Colors.white,
