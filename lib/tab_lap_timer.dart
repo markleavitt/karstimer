@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'constants.dart';
 import 'race_data.dart';
+import 'lap_tile.dart';
 
 class TabLapTimer extends StatefulWidget {
   @override
@@ -48,30 +49,6 @@ class _TabLapTimerState extends State<TabLapTimer> {
           ),
         ),
       ],
-    );
-  }
-}
-
-class LapTile extends StatelessWidget {
-  final int index;
-  LapTile(this.index);
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            'Lap: ${Provider.of<RaceData>(context).lapStats[index].lapNumber.toString().padLeft(3, ' ')}',
-            style: kLapStyle,
-          ),
-          Text(
-            'Time: ${Provider.of<RaceData>(context).lapStats[index].lapTimeString}',
-            style: kLapStyle,
-          ),
-        ],
-      ),
     );
   }
 }
