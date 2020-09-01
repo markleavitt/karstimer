@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await myRaceData.checkStatus();
+  await myRaceData.initialize();
   runApp(MyApp());
 }
 

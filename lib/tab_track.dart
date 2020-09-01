@@ -3,29 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'race_data.dart';
 
-class TabTrack extends StatefulWidget {
+class TabTrack extends StatelessWidget {
   @override
-  _TabTrackState createState() => _TabTrackState();
-}
-
-class _TabTrackState extends State<TabTrack> {
   @override
   Widget build(BuildContext context) {
-    StreamBuilder<Position>(
-      stream: myRaceData.positionStream,
-      builder: (context, thisPosition) {
-        if (!thisPosition.hasData) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-        return Expanded(
-          child: ListView(
-            children: myRaceData.positionWidgets,
-          ),
-        );
-      },
-    );
+    return Text('tracker goes here');
   }
 }
 

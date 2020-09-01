@@ -28,7 +28,7 @@ class _TabLapTimerState extends State<TabLapTimer> {
         _Header(),
         Expanded(
           child: ListView.builder(
-            itemCount: Provider.of<RaceData>(context).lapCount(),
+            itemCount: Provider.of<RaceData>(context).lapTimes.length + 1,
             itemBuilder: (context, index) {
               return Text('$index');
             },
@@ -86,7 +86,6 @@ class _HeaderButton extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6.0),
       child: GestureDetector(
         onTap: () {
-          print('button clicked');
           Provider.of<RaceData>(context, listen: false).toggleState();
         },
         child: Container(
