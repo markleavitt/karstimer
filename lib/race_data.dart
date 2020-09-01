@@ -9,20 +9,28 @@ class RaceData extends ChangeNotifier {
   final int intervalSecs = 1;
   bool isRunning = false;
   int elapsedTime = 0;
+  int lapNumber = 0;
   String elapsedTimeString = '00:00';
   Geolocator geolocator = Geolocator();
+  final locationOptions = LocationOptions(
+    accuracy: LocationAccuracy.high,
+    distanceFilter: 0,
+  );
+
   StreamSubscription<Position> positionStreamSubscription;
+  Position mapCenterPosition;
   Position startPosition;
   List<Position> positions = [];
   List<Widget> positionWidgets = [];
-  List<_lapTimes> lapTimes = [];
+  List<_LapStats> lapStats = [];
 
   Future<bool> initialize() async {
-    // Checks permission status of Geolocator, returns true if all OK
+    // Checks Geolocator permissions, gets map center, returns true if OK
     try {
       GeolocationStatus geolocationStatus =
           await geolocator.checkGeolocationPermissionStatus();
       print('geoLocationStatus is: $geolocationStatus');
+      mapCenterPosition = await geolocator.getCurrentPosition();
       return (geolocationStatus == GeolocationStatus.granted);
     } catch (e) {
       print('Geolocator error: $e');
@@ -31,11 +39,15 @@ class RaceData extends ChangeNotifier {
   }
 
   void toggleState() {
-    if (isRunning) {
-      stop();
-    } else {
-      start();
-    }
+    isRunning = !isRunning; // Toggle state of isRunning
+    isRunning ? _start() : _stop(); // Call start or stop method
+  }
+
+  void markLap() {
+    lapNumber++;
+    lapStats.insert(0, _LapStats(lapNumber, elapsedTime, elapsedTimeString));
+    _updateElapsedTime(true);
+    notifyListeners();
   }
 
   void _updateElapsedTime(bool reset) {
@@ -49,7 +61,7 @@ class RaceData extends ChangeNotifier {
     }
   }
 
-  Future<bool> start() async {
+  Future<bool> _start() async {
     isRunning = true;
     _updateElapsedTime(true);
     notifyListeners();
@@ -69,10 +81,6 @@ class RaceData extends ChangeNotifier {
     Position currentPosition = await geolocator.getCurrentPosition();
     startPosition = currentPosition;
     print('Starting position is: $currentPosition');
-    var locationOptions = LocationOptions(
-      accuracy: LocationAccuracy.high,
-      distanceFilter: 0,
-    );
     positionStreamSubscription = geolocator
         .getPositionStream(locationOptions)
         .listen((Position thisPosition) {
@@ -83,9 +91,9 @@ class RaceData extends ChangeNotifier {
     return true;
   }
 
-  Future<void> stop() async {
+  Future<void> _stop() async {
     isRunning = false;
-    positionStreamSubscription?.cancel();
+    positionStreamSubscription.cancel();
     notifyListeners();
   }
 
@@ -93,7 +101,9 @@ class RaceData extends ChangeNotifier {
   void createDummyData() {}
 }
 
-class _lapTimes {
-  int lapNumber;
-  int lapTime;
+class _LapStats {
+  _LapStats(this.lapNumber, this.lapTime, this.lapTimeString);
+  final int lapNumber;
+  final int lapTime;
+  final String lapTimeString;
 }

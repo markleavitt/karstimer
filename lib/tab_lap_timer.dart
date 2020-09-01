@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
+import 'constants.dart';
 import 'race_data.dart';
 
 class TabLapTimer extends StatefulWidget {
@@ -8,17 +10,7 @@ class TabLapTimer extends StatefulWidget {
 }
 
 class _TabLapTimerState extends State<TabLapTimer> {
-  bool _isTiming = false;
-  _onTogglePressed() async {
-    if (_isTiming) {
-      await myRaceData.stop();
-      _isTiming = false;
-    } else {
-      await myRaceData.start();
-      _isTiming = true;
-    }
-  }
-
+  //ScrollController _myListScrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -28,10 +20,31 @@ class _TabLapTimerState extends State<TabLapTimer> {
         _Header(),
         Expanded(
           child: ListView.builder(
-            itemCount: Provider.of<RaceData>(context).lapTimes.length + 1,
+            //controller: _myListScrollController,
+            itemCount: Provider.of<RaceData>(context).lapStats.length,
+            reverse: false,
+            shrinkWrap: true,
             itemBuilder: (context, index) {
-              return Text('$index');
+              return LapTile(index);
             },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10.0),
+          child: RaisedButton(
+            onPressed: () {
+              Provider.of<RaceData>(context, listen: false).markLap();
+            },
+            color: Colors.deepOrange,
+            child: Text(
+              'Mark Lap',
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: 'RacingSansOne',
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
       ],
@@ -39,16 +52,41 @@ class _TabLapTimerState extends State<TabLapTimer> {
   }
 }
 
+class LapTile extends StatelessWidget {
+  final int index;
+  LapTile(this.index);
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            'Lap: ${Provider.of<RaceData>(context).lapStats[index].lapNumber.toString().padLeft(3, ' ')}',
+            style: kLapStyle,
+          ),
+          Text(
+            'Time: ${Provider.of<RaceData>(context).lapStats[index].lapTimeString}',
+            style: kLapStyle,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Builds the Header with a button and elapsed time display
 class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20.0),
+      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Expanded(
-            flex: 1,
+            flex: 4,
             child: _HeaderButton(
               title:
                   Provider.of<RaceData>(context).isRunning ? 'STOP' : 'START',
@@ -58,13 +96,13 @@ class _Header extends StatelessWidget {
             ),
           ),
           Expanded(
-            flex: 1,
+            flex: 5,
             child: Text(
               Provider.of<RaceData>(context).elapsedTimeString,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 70.0,
-                fontWeight: FontWeight.bold,
+                fontFamily: 'RacingSansOne',
               ),
             ),
           ),
@@ -74,9 +112,9 @@ class _Header extends StatelessWidget {
   }
 }
 
+// Builds a button with specified title and color; connects via Provider
 class _HeaderButton extends StatelessWidget {
   _HeaderButton({@required this.title, @required this.color});
-
   final String title;
   final Color color;
 
@@ -93,7 +131,7 @@ class _HeaderButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.all(
-              Radius.circular(6.0),
+              Radius.circular(8.0),
             ),
           ),
           child: Text(

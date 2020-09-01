@@ -23,30 +23,33 @@ class MyApp extends StatelessWidget {
         home: DefaultTabController(
           length: 3,
           child: Scaffold(
-              appBar: AppBar(
-                bottom: TabBar(
-                  tabs: [
-                    Tab(icon: Icon(Icons.timer, size: 40.0)),
-                    Tab(icon: Icon(Icons.location_on, size: 40.0)),
-                    Tab(icon: Icon(Icons.settings, size: 40.0))
-                  ],
-                  unselectedLabelColor: Colors.black,
-                ),
-                title: Center(
-                  child: Text(
-                    'KarsTimer',
-                    style: TextStyle(
-                      fontSize: 30.0,
-                      fontFamily: 'RacingSansOne',
-                    ),
+            appBar: AppBar(
+              bottom: TabBar(
+                tabs: [
+                  Tab(icon: Icon(Icons.timer, size: 40.0)),
+                  Tab(icon: Icon(Icons.location_on, size: 40.0)),
+                  Tab(icon: Icon(Icons.settings, size: 40.0))
+                ],
+                unselectedLabelColor: Colors.black,
+              ),
+              title: Center(
+                child: Text(
+                  'KarsTimer',
+                  style: TextStyle(
+                    fontSize: 30.0,
+                    fontFamily: 'RacingSansOne',
                   ),
                 ),
               ),
-              body: TabBarView(children: [
+            ),
+            body: TabBarView(
+              children: [
                 TabLapTimer(),
                 TabTrack(),
                 TabSettings(),
-              ])),
+              ],
+            ),
+          ),
         ),
       ),
     );

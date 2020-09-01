@@ -12,7 +12,8 @@ class TabTrack extends StatefulWidget {
 
 class _TabTrackState extends State<TabTrack> {
   GoogleMapController mapController;
-  final LatLng _center = const LatLng(45.521563, -122.677433);
+  final LatLng _center = LatLng(myRaceData.mapCenterPosition.latitude,
+      myRaceData.mapCenterPosition.longitude);
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
@@ -23,8 +24,9 @@ class _TabTrackState extends State<TabTrack> {
       onMapCreated: _onMapCreated,
       initialCameraPosition: CameraPosition(
         target: _center,
-        zoom: 11.0,
+        zoom: 16.0,
       ),
+      markers: {},
     );
   }
 }
