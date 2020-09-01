@@ -1,8 +1,7 @@
 import 'dart:async';
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
-import 'package:geolocation/geolocation.dart';
+import 'package:geolocator/geolocator.dart';
+import 'race_data.dart';
 
 class TabTrack extends StatefulWidget {
   @override
@@ -10,18 +9,30 @@ class TabTrack extends StatefulWidget {
 }
 
 class _TabTrackState extends State<TabTrack> {
-  List<LocationData> _locations = [];
-  List<StreamSubscription<dynamic>> _subscriptions = [];
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text('Future tab for tracking'));
+    StreamBuilder<Position>(
+      stream: myRaceData.positionStream,
+      builder: (context, thisPosition) {
+        if (!thisPosition.hasData) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        return Expanded(
+          child: ListView(
+            children: myRaceData.positionWidgets,
+          ),
+        );
+      },
+    );
   }
 }
 
 class LocationData {
   LocationData({
     @required this.id,
-    this.result,
+    //this.result,
     @required this.origin,
     @required this.color,
     @required this.createdAtTimestamp,
@@ -29,7 +40,7 @@ class LocationData {
   });
 
   final int id;
-  final LocationResult result;
+  //final LocationResult result;
   final String origin;
   final Color color;
   final int createdAtTimestamp;
