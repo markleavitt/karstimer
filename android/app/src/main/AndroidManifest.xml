@@ -12,6 +12,11 @@
         android:name="io.flutter.app.FlutterApplication"
         android:label="karstimer"
         android:icon="@mipmap/ic_launcher">
+        <!-- Added this to enable Google Maps API usage -->
+        <meta-data
+          android:name="com.google.android.geo.API_KEY"
+          android:value="AIzaSyCu3u9jJtR7SCvt4aY4XWSjKDoZ9uLApo4"
+          />
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
