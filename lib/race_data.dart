@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 // Create working instance of RaceData class for global use.
 RaceData myRaceData = RaceData();
@@ -14,7 +15,7 @@ class RaceData extends ChangeNotifier {
   Geolocator geolocator = Geolocator();
   final locationOptions = LocationOptions(
     accuracy: LocationAccuracy.high,
-    distanceFilter: 0, // Experiment with distanceFilter under race conditions
+    distanceFilter: 3, // Experiment with distanceFilter under race conditions
   );
 
   StreamSubscription<Position> positionStreamSubscription;
@@ -22,6 +23,7 @@ class RaceData extends ChangeNotifier {
   Position startPosition;
   List<Position> positions = [];
   List<_LapStats> lapStats = [];
+  Map<String, Marker> markers = {};
 
   Future<bool> initialize() async {
     // Checks Geolocator permissions, gets map center, returns true if OK
@@ -81,14 +83,26 @@ class RaceData extends ChangeNotifier {
     startPosition = currentPosition;
     print('Starting position is: $currentPosition');
     // Now initiate the position stream subscription
-    positionStreamSubscription = geolocator
-        .getPositionStream(locationOptions)
-        .listen((Position thisPosition) {
-      print(thisPosition);
+    positionStreamSubscription =
+        geolocator.getPositionStream(locationOptions).listen((position) {
+      print('Position: $position, Speed: ${position.speed}');
+      addPosition(position);
+      notifyListeners();
     });
 
     print('positionStream subscription started');
     return true;
+  }
+
+  void addPosition(Position newPosition) {
+    final newMarker = Marker(
+      markerId: MarkerId(elapsedTimeString),
+      position: LatLng(newPosition.latitude, newPosition.longitude),
+      infoWindow: InfoWindow(
+          title:
+              'Lap: $lapNumber, ET: $elapsedTimeString, Speed: ${newPosition.speed.toStringAsFixed(1)}'),
+    );
+    markers[elapsedTimeString] = newMarker;
   }
 
   Future<void> _stop() async {

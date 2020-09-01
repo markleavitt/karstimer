@@ -26,7 +26,7 @@ class _TabTrackState extends State<TabTrack> {
         target: _center,
         zoom: 16.0,
       ),
-      markers: {},
+      markers: Provider.of<RaceData>(context).markers.values.toSet(),
     );
   }
 }
