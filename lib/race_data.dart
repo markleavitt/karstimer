@@ -6,7 +6,7 @@ import 'package:geolocator/geolocator.dart';
 RaceData myRaceData = RaceData();
 
 class RaceData extends ChangeNotifier {
-  final int intervalSecs = 1;
+  final int intervalSecs = 1; // Timer will tick 1x/sec
   bool isRunning = false;
   int elapsedTime = 0;
   int lapNumber = 0;
@@ -14,14 +14,13 @@ class RaceData extends ChangeNotifier {
   Geolocator geolocator = Geolocator();
   final locationOptions = LocationOptions(
     accuracy: LocationAccuracy.high,
-    distanceFilter: 0,
+    distanceFilter: 0, // Experiment with distanceFilter under race conditions
   );
 
   StreamSubscription<Position> positionStreamSubscription;
   Position mapCenterPosition;
   Position startPosition;
   List<Position> positions = [];
-  List<Widget> positionWidgets = [];
   List<_LapStats> lapStats = [];
 
   Future<bool> initialize() async {
@@ -46,11 +45,11 @@ class RaceData extends ChangeNotifier {
   void markLap() {
     lapNumber++;
     lapStats.insert(0, _LapStats(lapNumber, elapsedTime, elapsedTimeString));
-    _updateElapsedTime(true);
+    _updateElapsedTime(reset: true);
     notifyListeners();
   }
 
-  void _updateElapsedTime(bool reset) {
+  void _updateElapsedTime({bool reset}) {
     if (!reset) {
       elapsedTime += intervalSecs;
       elapsedTimeString =
@@ -63,13 +62,13 @@ class RaceData extends ChangeNotifier {
 
   Future<bool> _start() async {
     isRunning = true;
-    _updateElapsedTime(true);
+    _updateElapsedTime(reset: true);
     notifyListeners();
     print('timer started');
     // Set up the periodic timer
     Timer.periodic(Duration(seconds: intervalSecs), (timer) {
       if (isRunning) {
-        _updateElapsedTime(false);
+        _updateElapsedTime(reset: false);
         notifyListeners();
         print('timer tick $elapsedTime');
       } else {
@@ -81,6 +80,7 @@ class RaceData extends ChangeNotifier {
     Position currentPosition = await geolocator.getCurrentPosition();
     startPosition = currentPosition;
     print('Starting position is: $currentPosition');
+    // Now initiate the position stream subscription
     positionStreamSubscription = geolocator
         .getPositionStream(locationOptions)
         .listen((Position thisPosition) {
