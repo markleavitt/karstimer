@@ -30,26 +30,30 @@ class _TabLapTimerState extends State<TabLapTimer> {
             },
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10.0),
-          child: RaisedButton(
-            onPressed: () {
-              if (Provider.of<RaceData>(context, listen: false).isRunning) {
-                Provider.of<RaceData>(context, listen: false).markLap();
-              }
-            },
-            color: Colors.deepOrange,
-            child: Text(
-              'Mark Lap',
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: 'RacingSansOne',
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+        Provider.of<RaceData>(context).isAutoLapMark
+            ? Container()
+            : Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10.0),
+                child: RaisedButton(
+                  onPressed: () {
+                    if (Provider.of<RaceData>(context, listen: false)
+                        .isRunning) {
+                      Provider.of<RaceData>(context, listen: false).markLap();
+                    }
+                  },
+                  color: Colors.deepOrange,
+                  child: Text(
+                    'Mark Lap',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'RacingSansOne',
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-        ),
       ],
     );
   }

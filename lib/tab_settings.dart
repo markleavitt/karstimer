@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:karstimer/constants.dart';
+import 'package:karstimer/race_data.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 
 class TabSettings extends StatefulWidget {
@@ -7,40 +11,72 @@ class TabSettings extends StatefulWidget {
 }
 
 class _TabSettingsState extends State<TabSettings> {
-  // GeolocationResult _locationOperationalResult;
-  // GeolocationResult _requestPermissionResult;
-  //
-  // _checkLocationOperational() async {
-  //   final GeolocationResult result = await Geolocation.isLocationOperational();
-  //
-  //   if (mounted) {
-  //     setState(() {
-  //       _locationOperationalResult = result;
-  //     });
-  //   }
-  // }
-  //
-  // _requestPermission() async {
-  //   final GeolocationResult result =
-  //       await Geolocation.requestLocationPermission(
-  //     permission: const LocationPermission(
-  //       android: LocationPermissionAndroid.fine,
-  //       ios: LocationPermissionIOS.always,
-  //     ),
-  //     openSettingsIfDenied: true,
-  //   );
-  //
-  //   if (mounted) {
-  //     setState(() {
-  //       _requestPermissionResult = result;
-  //     });
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('This is the settings screen'),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 20.0),
+      child: Column(
+        children: [
+          Divider(
+            thickness: 4,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text("Automatic lap marking (GPS)", style: kLapButtonStyle),
+              Switch(
+                value: myRaceData.isAutoLapMark,
+                onChanged: (bool newValue) {
+                  setState(() {
+                    myRaceData.setIsAutoLapMark(newValue);
+                  });
+                },
+              ),
+            ],
+          ),
+          Divider(
+            thickness: 4,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text("Simulate GPS data", style: kLapButtonStyle),
+              Switch(
+                value: myRaceData.isSimulatedData,
+                onChanged: (bool newValue) {
+                  setState(() {
+                    myRaceData.setIsSimulatedData(newValue);
+                  });
+                },
+              ),
+            ],
+          ),
+          Divider(
+            thickness: 4,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text("GPS update trigger:  DISTANCE", style: kLapButtonStyle),
+              Switch(
+                value: myRaceData.isTimedUpdates,
+                onChanged: (bool newValue) {
+                  setState(() {
+                    myRaceData.setIsTimedUpdates(newValue);
+                  });
+                },
+              ),
+              Text("TIME", style: kLapButtonStyle),
+            ],
+          ),
+          Divider(
+            thickness: 4,
+          ),
+        ],
+      ),
     );
   }
 }

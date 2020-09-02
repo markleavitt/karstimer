@@ -2,13 +2,19 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // Create working instance of RaceData class for global use.
 RaceData myRaceData = RaceData();
 
 class RaceData extends ChangeNotifier {
   final int intervalSecs = 1; // Timer will tick 1x/sec
+  var prefs;
   bool isRunning = false;
+  bool isAutoLapMark = false;
+  bool isSimulatedData = false;
+  bool isTimedUpdates = true;
+  int distanceFilter = 3;
   int elapsedTime = 0;
   int currentLapNumber = 1;
   String elapsedTimeString = '00:00';
@@ -35,6 +41,11 @@ class RaceData extends ChangeNotifier {
           await geolocator.checkGeolocationPermissionStatus();
       print('Initial geoLocationStatus was: $geolocationStatus');
       mapCenterPosition = await geolocator.getCurrentPosition();
+      // Get shared preferences stored on disk
+      prefs = await SharedPreferences.getInstance();
+      isAutoLapMark = prefs.getBool('isAutoLapMark') ?? false;
+      isSimulatedData = prefs.getBool('isSimulatedData') ?? false;
+      isTimedUpdates = prefs.getBool('isTimedUpdates') ?? true;
       return (geolocationStatus == GeolocationStatus.granted);
     } catch (e) {
       print('Geolocator error: $e');
@@ -57,6 +68,21 @@ class RaceData extends ChangeNotifier {
 
   void createDummyData() {
     // TODO need mock GPS creation method
+  }
+
+  void setIsAutoLapMark(bool setting) async {
+    isAutoLapMark = setting;
+    await prefs.setBool('isAutoLapMark', isAutoLapMark);
+  }
+
+  void setIsSimulatedData(bool setting) async {
+    isSimulatedData = setting;
+    await prefs.setBool('isSimulatedData', isSimulatedData);
+  }
+
+  void setIsTimedUpdates(bool setting) async {
+    isTimedUpdates = setting;
+    await prefs.setBool('isTimedUpdates', isTimedUpdates);
   }
 
   // Following methods are for internal use only
@@ -91,8 +117,12 @@ class RaceData extends ChangeNotifier {
     startPosition = currentPosition;
     print('Starting position is: $currentPosition');
     // Now start the position stream subscription
+    final locationUpdateOptions = LocationOptions(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: (isTimedUpdates ? 0 : distanceFilter),
+    );
     positionStreamSubscription =
-        geolocator.getPositionStream(locationOptions).listen((newPos) {
+        geolocator.getPositionStream(locationUpdateOptions).listen((newPos) {
       _addPosition(newPos);
       notifyListeners();
     });
