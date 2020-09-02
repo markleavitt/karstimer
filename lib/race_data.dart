@@ -22,7 +22,6 @@ class RaceData extends ChangeNotifier {
   final locationOptions = LocationOptions(
     accuracy: LocationAccuracy.high,
     distanceFilter: 0,
-    // Can experiment with distanceFilter under race conditions
     // Using 0 gives timed 1 sec updates
   );
 
@@ -116,17 +115,19 @@ class RaceData extends ChangeNotifier {
     Position currentPosition = await geolocator.getCurrentPosition();
     startPosition = currentPosition;
     print('Starting position is: $currentPosition');
-    // Now start the position stream subscription
+    // Configure locationUpdateOptions for timed (0) or distance
     final locationUpdateOptions = LocationOptions(
       accuracy: LocationAccuracy.high,
       distanceFilter: (isTimedUpdates ? 0 : distanceFilter),
     );
+    // Finally, start subscribing to the position stream
     positionStreamSubscription =
         geolocator.getPositionStream(locationUpdateOptions).listen((newPos) {
       _addPosition(newPos);
       notifyListeners();
     });
-    print('positionStream subscription started');
+    print(
+        'GPS subscription started in ${isTimedUpdates ? 'timed' : 'distance'} mode');
     return true;
   }
 
