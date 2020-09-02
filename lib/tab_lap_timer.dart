@@ -63,7 +63,7 @@ class _Header extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Expanded(
-            flex: 4,
+            flex: 3,
             child: _HeaderButton(
               title:
                   Provider.of<RaceData>(context).isRunning ? 'STOP' : 'START',
@@ -78,7 +78,7 @@ class _Header extends StatelessWidget {
               Provider.of<RaceData>(context).elapsedTimeString,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 70.0,
+                fontSize: 80.0,
                 fontFamily: 'RacingSansOne',
               ),
             ),

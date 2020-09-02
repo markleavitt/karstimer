@@ -1,19 +1,16 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 import 'race_data.dart';
 import 'package:provider/provider.dart';
-import 'lap_tile.dart';
 import 'constants.dart';
 
 class TabTrack extends StatefulWidget {
-  int lapToView;
   @override
   _TabTrackState createState() => _TabTrackState();
 }
 
 class _TabTrackState extends State<TabTrack> {
+  int lapToView;
   GoogleMapController mapController;
   final LatLng _center = LatLng(myRaceData.mapCenterPosition.latitude,
       myRaceData.mapCenterPosition.longitude);
@@ -22,22 +19,22 @@ class _TabTrackState extends State<TabTrack> {
   }
 
   void increaseLapNumber() {
-    if (widget.lapToView <
+    if (lapToView <
         Provider.of<RaceData>(context, listen: false).currentLapNumber) {
-      setState(() => widget.lapToView++);
+      setState(() => lapToView++);
     }
   }
 
   void decreaseLapNumber() {
-    if (widget.lapToView > 1) {
-      setState(() => widget.lapToView--);
+    if (lapToView > 1) {
+      setState(() => lapToView--);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.lapToView == null) {
-      widget.lapToView = 1;
+    if (lapToView == null) {
+      lapToView = 1;
     }
     return Column(
       children: [
@@ -47,19 +44,25 @@ class _TabTrackState extends State<TabTrack> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text(
-                'Lap: ${widget.lapToView}',
+                'Lap: $lapToView',
                 style: kLapStyle,
               ),
               RaisedButton(
-                child: Text('Later'),
+                child: Text(
+                  'Earlier Lap',
+                  style: kLapButtonStyle,
+                ),
                 onPressed: () {
-                  increaseLapNumber();
+                  decreaseLapNumber();
                 },
               ),
               RaisedButton(
-                child: Text('Earlier'),
+                child: Text(
+                  'Later Lap',
+                  style: kLapButtonStyle,
+                ),
                 onPressed: () {
-                  decreaseLapNumber();
+                  increaseLapNumber();
                 },
               ),
             ],
@@ -73,7 +76,7 @@ class _TabTrackState extends State<TabTrack> {
               zoom: 16.0,
             ),
             markers: Provider.of<RaceData>(context)
-                .lapMarkers[widget.lapToView]
+                .lapMarkers[lapToView]
                 .values
                 .toSet(),
           ),
