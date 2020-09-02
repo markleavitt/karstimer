@@ -33,8 +33,9 @@ class _TabTrackState extends State<TabTrack> {
 
   @override
   Widget build(BuildContext context) {
+    // Ensure latest lap is showing when view opens
     if (lapToView == null) {
-      lapToView = 1;
+      lapToView = Provider.of<RaceData>(context).currentLapNumber;
     }
     return Column(
       children: [
