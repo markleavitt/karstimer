@@ -8,12 +8,12 @@ import 'lap_tile.dart';
 import 'constants.dart';
 
 class TabTrack extends StatefulWidget {
+  int lapToView;
   @override
   _TabTrackState createState() => _TabTrackState();
 }
 
 class _TabTrackState extends State<TabTrack> {
-  int indexToView = 0; // Defaults to most recent lap, stored at index 0
   GoogleMapController mapController;
   final LatLng _center = LatLng(myRaceData.mapCenterPosition.latitude,
       myRaceData.mapCenterPosition.longitude);
@@ -21,8 +21,24 @@ class _TabTrackState extends State<TabTrack> {
     mapController = controller;
   }
 
+  void increaseLapNumber() {
+    if (widget.lapToView <
+        Provider.of<RaceData>(context, listen: false).currentLapNumber) {
+      setState(() => widget.lapToView++);
+    }
+  }
+
+  void decreaseLapNumber() {
+    if (widget.lapToView > 1) {
+      setState(() => widget.lapToView--);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (widget.lapToView == null) {
+      widget.lapToView = 1;
+    }
     return Column(
       children: [
         Padding(
@@ -31,19 +47,19 @@ class _TabTrackState extends State<TabTrack> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text(
-                'Lap: ${Provider.of<RaceData>(context).lapStats[indexToView].lapNumber}',
+                'Lap: ${widget.lapToView}',
                 style: kLapStyle,
               ),
               RaisedButton(
                 child: Text('Later'),
                 onPressed: () {
-                  indexToView--;
+                  increaseLapNumber();
                 },
               ),
               RaisedButton(
                 child: Text('Earlier'),
                 onPressed: () {
-                  indexToView++;
+                  decreaseLapNumber();
                 },
               ),
             ],
@@ -56,7 +72,10 @@ class _TabTrackState extends State<TabTrack> {
               target: _center,
               zoom: 16.0,
             ),
-            markers: Provider.of<RaceData>(context).markers.values.toSet(),
+            markers: Provider.of<RaceData>(context)
+                .lapMarkers[widget.lapToView]
+                .values
+                .toSet(),
           ),
         ),
       ],

@@ -10,27 +10,30 @@ class RaceData extends ChangeNotifier {
   final int intervalSecs = 1; // Timer will tick 1x/sec
   bool isRunning = false;
   int elapsedTime = 0;
-  int lapNumber = 0;
+  int currentLapNumber = 1;
   String elapsedTimeString = '00:00';
   Geolocator geolocator = Geolocator();
   final locationOptions = LocationOptions(
     accuracy: LocationAccuracy.high,
-    distanceFilter: 3, // Experiment with distanceFilter under race conditions
+    distanceFilter: 0,
+    // Can experiment with distanceFilter under race conditions
+    // Using 0 gives timed 1 sec updates
   );
 
   StreamSubscription<Position> positionStreamSubscription;
   Position mapCenterPosition;
   Position startPosition;
-  List<Position> positions = [];
+  List<Position> racePositions = [];
   List<_LapStats> lapStats = [];
-  Map<String, Marker> markers = {};
+  List<Map<String, Marker>> lapMarkers = [{}, {}];
+  // Note: lapMarkers index corresponds to Lap Number, entry 0 is ignored
 
   Future<bool> initialize() async {
-    // Checks Geolocator permissions, gets map center, returns true if OK
     try {
+      // Check Geolocator permissions, get map center, return true if OK
       GeolocationStatus geolocationStatus =
           await geolocator.checkGeolocationPermissionStatus();
-      print('geoLocationStatus is: $geolocationStatus');
+      print('Initial geoLocationStatus was: $geolocationStatus');
       mapCenterPosition = await geolocator.getCurrentPosition();
       return (geolocationStatus == GeolocationStatus.granted);
     } catch (e) {
@@ -40,17 +43,23 @@ class RaceData extends ChangeNotifier {
   }
 
   void toggleState() {
-    isRunning = !isRunning; // Toggle state of isRunning
-    isRunning ? _start() : _stop(); // Call start or stop method
+    isRunning = !isRunning;
+    isRunning ? _start() : _stop();
   }
 
   void markLap() {
-    lapNumber++;
-    lapStats.insert(0, _LapStats(lapNumber, elapsedTime, elapsedTimeString));
+    lapStats.insert(
+        0, _LapStats(currentLapNumber, elapsedTime, elapsedTimeString));
     _updateElapsedTime(reset: true);
+    currentLapNumber++;
     notifyListeners();
   }
 
+  void createDummyData() {
+    // TODO need mock GPS creation method
+  }
+
+  // Following methods are for internal use only
   void _updateElapsedTime({bool reset}) {
     if (!reset) {
       elapsedTime += intervalSecs;
@@ -67,12 +76,11 @@ class RaceData extends ChangeNotifier {
     _updateElapsedTime(reset: true);
     notifyListeners();
     print('timer started');
-    // Set up the periodic timer
+    // Start the periodic timer
     Timer.periodic(Duration(seconds: intervalSecs), (timer) {
       if (isRunning) {
         _updateElapsedTime(reset: false);
         notifyListeners();
-        print('timer tick $elapsedTime');
       } else {
         timer.cancel();
         print('timer stopped');
@@ -82,27 +90,32 @@ class RaceData extends ChangeNotifier {
     Position currentPosition = await geolocator.getCurrentPosition();
     startPosition = currentPosition;
     print('Starting position is: $currentPosition');
-    // Now initiate the position stream subscription
+    // Now start the position stream subscription
     positionStreamSubscription =
-        geolocator.getPositionStream(locationOptions).listen((position) {
-      print('Position: $position, Speed: ${position.speed}');
-      addPosition(position);
+        geolocator.getPositionStream(locationOptions).listen((newPos) {
+      _addPosition(newPos);
       notifyListeners();
     });
-
     print('positionStream subscription started');
     return true;
   }
 
-  void addPosition(Position newPosition) {
+  void _addPosition(Position newPosition) {
+    // Add to overall race data
+    racePositions.add(newPosition);
+    // Build marker for this position
     final newMarker = Marker(
       markerId: MarkerId(elapsedTimeString),
       position: LatLng(newPosition.latitude, newPosition.longitude),
       infoWindow: InfoWindow(
           title:
-              'Lap: $lapNumber, ET: $elapsedTimeString, Speed: ${newPosition.speed.toStringAsFixed(1)}'),
+              'L:$currentLapNumber ET: $elapsedTimeString Spd: ${newPosition.speed.toStringAsFixed(0)} mph'),
     );
-    markers[elapsedTimeString] = newMarker;
+    // Add marker to map for this lap (note entry 0 in list is not used)
+    while (currentLapNumber > lapMarkers.length - 1) {
+      lapMarkers.add({}); // Add an empty map for this lap
+    }
+    lapMarkers[currentLapNumber][elapsedTimeString] = newMarker;
   }
 
   Future<void> _stop() async {
@@ -110,9 +123,6 @@ class RaceData extends ChangeNotifier {
     positionStreamSubscription.cancel();
     notifyListeners();
   }
-
-// createDummyData is just used for testing
-  void createDummyData() {}
 }
 
 class _LapStats {
