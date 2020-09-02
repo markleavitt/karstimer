@@ -34,7 +34,9 @@ class _TabLapTimerState extends State<TabLapTimer> {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10.0),
           child: RaisedButton(
             onPressed: () {
-              Provider.of<RaceData>(context, listen: false).markLap();
+              if (Provider.of<RaceData>(context, listen: false).isRunning) {
+                Provider.of<RaceData>(context, listen: false).markLap();
+              }
             },
             color: Colors.deepOrange,
             child: Text(
