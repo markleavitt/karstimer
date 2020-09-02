@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -100,32 +101,36 @@ class RaceData extends ChangeNotifier {
     isRunning = true;
     _updateElapsedTime(reset: true);
     notifyListeners();
-    print('timer started');
+    // Get and save starting position
+    startPosition = await geolocator.getCurrentPosition();
+    print('Starting position is: $startPosition');
     // Start the periodic timer
+    print('timer started');
     Timer.periodic(Duration(seconds: intervalSecs), (timer) {
       if (isRunning) {
         _updateElapsedTime(reset: false);
+        if (isSimulatedData) {
+          _addPosition(simulateGPS(elapsedTime));
+        }
         notifyListeners();
       } else {
         timer.cancel();
         print('timer stopped');
       }
     });
-    // Save starting position
-    Position currentPosition = await geolocator.getCurrentPosition();
-    startPosition = currentPosition;
-    print('Starting position is: $currentPosition');
     // Configure locationUpdateOptions for timed (0) or distance
     final locationUpdateOptions = LocationOptions(
       accuracy: LocationAccuracy.high,
       distanceFilter: (isTimedUpdates ? 0 : distanceFilter),
     );
     // Finally, start subscribing to the position stream
-    positionStreamSubscription =
-        geolocator.getPositionStream(locationUpdateOptions).listen((newPos) {
-      _addPosition(newPos);
-      notifyListeners();
-    });
+    if (!isSimulatedData) {
+      positionStreamSubscription =
+          geolocator.getPositionStream(locationUpdateOptions).listen((newPos) {
+        _addPosition(newPos);
+        notifyListeners();
+      });
+    }
     print(
         'GPS subscription started in ${isTimedUpdates ? 'timed' : 'distance'} mode');
     return true;
@@ -150,9 +155,27 @@ class RaceData extends ChangeNotifier {
   }
 
   Future<void> _stop() async {
-    isRunning = false;
-    positionStreamSubscription.cancel();
+    isRunning = false; // This will stop the timer at the next tick
+    if (positionStreamSubscription != null) {
+      positionStreamSubscription.cancel();
+    }
     notifyListeners();
+  }
+
+  Position simulateGPS(int eTime) {
+    // Simulates a circular path which passes through the start point
+    const double excursion = 0.001;
+    double deg2rad = pi / 180.0;
+    double t = eTime.toDouble();
+    double x = sin(t * 6 * deg2rad);
+    double y = cos(t * 6 * deg2rad);
+    print(
+        'Simulator: ${eTime.toString().padLeft(3, ' ')}, x: ${x.toStringAsFixed(2).padLeft(4)}, y ${y.toStringAsFixed(2).padLeft(4)}');
+    double lat = startPosition.latitude + excursion * y;
+    double long = startPosition.longitude + 2.0 * excursion * x;
+    Position simPosition = Position(
+        latitude: lat, longitude: long, timestamp: DateTime.now(), speed: 60.0);
+    return simPosition;
   }
 }
 
