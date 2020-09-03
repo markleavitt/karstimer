@@ -173,16 +173,21 @@ class RaceData extends ChangeNotifier {
   }
 
   Position _simulateGPS(int eTime) {
-    // Simulates a circular path which passes through the start point
-    const double excursion = 0.001;
+    // Simulates an elliptical path which passes through the start point
+    const double minorAxis =
+        0.001; // Track ellipse minor axis in degrees latitude
+    const double majorAxis =
+        0.0025; // Track ellipse major axis in deg longitude
+    const double degPerSec = 12.0; // Degrees around the ellipse per second
     double deg2rad = pi / 180.0;
     double t = eTime.toDouble();
     // Create an elliptical trajectory with speed variation too
-    double x = sin(t * 12 * deg2rad);
-    double y = 1 - cos(t * 12 * deg2rad);
-    double s = 80 + 20 * cos(t * 24 * deg2rad);
-    double lat = startPosition.latitude + excursion * y;
-    double long = startPosition.longitude + 2.5 * excursion * x;
+    double x = sin(t * degPerSec * deg2rad);
+    double y =
+        1 - cos(t * degPerSec * deg2rad); // Start at bottom center, go CCW
+    double s = 80.0 + 20.0 * cos(t * 2.0 * degPerSec * deg2rad);
+    double lat = startPosition.latitude + minorAxis * y;
+    double long = startPosition.longitude + majorAxis * x;
     Position simPosition = Position(
         latitude: lat, longitude: long, timestamp: DateTime.now(), speed: s);
     return simPosition;
