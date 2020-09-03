@@ -1,16 +1,15 @@
 # karstimer
 
-A new Flutter application.
+A Flutter App to do lap timing for auto racing. 
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This app uses the smartphone GPS to record lap times 
+during a practice run or a race. 
 
-A few resources to get you started if this is your first Flutter project:
+Right now, laps can be marked manually. A function to use GPS to detect
+crossing the starting line is still To Be Developed.
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+A map display of recorded positions, speeds, and timestamps is available.
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+There is no saving to disk or cloud yet.
