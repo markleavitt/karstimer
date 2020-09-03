@@ -68,8 +68,12 @@ class RaceData extends ChangeNotifier {
     notifyListeners();
   }
 
-  void createDummyData() {
-    // TODO need mock GPS creation method
+  void clearData() {
+    racePositions = [];
+    lapStats = [];
+    lapMarkers = [{}, {}];
+    currentLapNumber = 1;
+    _updateElapsedTime(reset: true);
   }
 
   void setIsDarkTheme(bool setting) async {
@@ -106,7 +110,6 @@ class RaceData extends ChangeNotifier {
 
   Future<bool> _start() async {
     isRunning = true;
-    _updateElapsedTime(reset: true);
     notifyListeners();
     // Get and save starting position
     startPosition = await geolocator.getCurrentPosition();

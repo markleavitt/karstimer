@@ -24,6 +24,22 @@ class _TabSettingsState extends State<TabSettings> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Text("Clear data", style: kLapButtonStyle),
+              RaisedButton(
+                child: Text('CLEAR'),
+                onPressed: () {
+                  myRaceData.clearData();
+                },
+              )
+            ],
+          ),
+          Divider(
+            thickness: 4,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
               Text("Automatic lap marking (GPS)", style: kLapButtonStyle),
               Switch(
                 value: myRaceData.isAutoLapMark,
