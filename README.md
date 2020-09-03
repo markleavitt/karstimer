@@ -17,4 +17,5 @@ There is no saving to disk or cloud yet.
 ## Credits
 
 Initial development: Mark Leavitt, Wearable Health Labs, LLC
+
 Custom app logo: Carolyn Leavitt
