@@ -11,6 +11,7 @@ RaceData myRaceData = RaceData();
 class RaceData extends ChangeNotifier {
   final int intervalSecs = 1; // Timer will tick 1x/sec
   var prefs;
+  bool isDarkTheme = false;
   bool isRunning = false;
   bool isAutoLapMark = false;
   bool isSimulatedData = false;
@@ -43,6 +44,7 @@ class RaceData extends ChangeNotifier {
       mapCenterPosition = await geolocator.getCurrentPosition();
       // Get shared preferences stored on disk
       prefs = await SharedPreferences.getInstance();
+      isDarkTheme = prefs.getBool('isDarkTheme') ?? false;
       isAutoLapMark = prefs.getBool('isAutoLapMark') ?? false;
       isSimulatedData = prefs.getBool('isSimulatedData') ?? false;
       isTimedUpdates = prefs.getBool('isTimedUpdates') ?? true;
@@ -68,6 +70,11 @@ class RaceData extends ChangeNotifier {
 
   void createDummyData() {
     // TODO need mock GPS creation method
+  }
+
+  void setIsDarkTheme(bool setting) async {
+    isDarkTheme = setting;
+    await prefs.setBool('isDarkTheme', isDarkTheme);
   }
 
   void setIsAutoLapMark(bool setting) async {
@@ -167,14 +174,14 @@ class RaceData extends ChangeNotifier {
     const double excursion = 0.001;
     double deg2rad = pi / 180.0;
     double t = eTime.toDouble();
+    // Create an elliptical trajectory with speed variation too
     double x = sin(t * 6 * deg2rad);
-    double y = cos(t * 6 * deg2rad);
-    print(
-        'Simulator: ${eTime.toString().padLeft(3, ' ')}, x: ${x.toStringAsFixed(2).padLeft(4)}, y ${y.toStringAsFixed(2).padLeft(4)}');
+    double y = -cos(t * 6 * deg2rad);
+    double s = 80 + 20 * cos(t * 6 * deg2rad);
     double lat = startPosition.latitude + excursion * y;
-    double long = startPosition.longitude + 2.0 * excursion * x;
+    double long = startPosition.longitude + 2.5 * excursion * x;
     Position simPosition = Position(
-        latitude: lat, longitude: long, timestamp: DateTime.now(), speed: 60.0);
+        latitude: lat, longitude: long, timestamp: DateTime.now(), speed: s);
     return simPosition;
   }
 }

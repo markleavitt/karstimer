@@ -20,6 +20,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => myRaceData,
       child: MaterialApp(
+        theme: myRaceData.isDarkTheme ? ThemeData.dark() : ThemeData.light(),
         home: DefaultTabController(
           length: 3,
           child: Scaffold(
@@ -30,7 +31,6 @@ class MyApp extends StatelessWidget {
                   Tab(icon: Icon(Icons.location_on, size: 40.0)),
                   Tab(icon: Icon(Icons.settings, size: 40.0))
                 ],
-                unselectedLabelColor: Colors.black,
               ),
               title: Center(
                 child: Text(

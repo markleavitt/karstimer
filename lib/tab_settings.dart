@@ -75,6 +75,24 @@ class _TabSettingsState extends State<TabSettings> {
           Divider(
             thickness: 4,
           ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text("Dark theme (requires app restart)", style: kLapButtonStyle),
+              Switch(
+                value: myRaceData.isDarkTheme,
+                onChanged: (bool newValue) {
+                  setState(() {
+                    myRaceData.setIsDarkTheme(newValue);
+                  });
+                },
+              ),
+            ],
+          ),
+          Divider(
+            thickness: 4,
+          ),
         ],
       ),
     );

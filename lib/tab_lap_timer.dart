@@ -33,8 +33,8 @@ class _TabLapTimerState extends State<TabLapTimer> {
         Provider.of<RaceData>(context).isAutoLapMark
             ? Container()
             : Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10.0),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 20.0, vertical: 10.0),
                 child: RaisedButton(
                   onPressed: () {
                     if (Provider.of<RaceData>(context, listen: false)
@@ -42,14 +42,15 @@ class _TabLapTimerState extends State<TabLapTimer> {
                       Provider.of<RaceData>(context, listen: false).markLap();
                     }
                   },
-                  color: Colors.deepOrange,
-                  child: Text(
-                    'Mark Lap',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'RacingSansOne',
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Mark Lap',
+                      style: TextStyle(
+                        //color: Colors.white,
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
