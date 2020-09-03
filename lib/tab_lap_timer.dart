@@ -85,7 +85,7 @@ class _Header extends StatelessWidget {
               Provider.of<RaceData>(context).elapsedTimeString,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 80.0,
+                fontSize: 70.0,
                 fontFamily: 'RacingSansOne',
               ),
             ),
@@ -123,7 +123,7 @@ class _HeaderButton extends StatelessWidget {
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 40.0,
+              fontSize: 28,
               fontFamily: 'RacingSansOne',
             ),
           ),

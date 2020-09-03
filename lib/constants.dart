@@ -7,6 +7,10 @@ const TextStyle kLapStyle = TextStyle(
 );
 
 const TextStyle kLapButtonStyle = TextStyle(
-  fontSize: 18.0,
+  fontSize: 16.0,
+  fontWeight: FontWeight.bold,
+);
+const TextStyle kSettingStyle = TextStyle(
+  fontSize: 14.0,
   fontWeight: FontWeight.bold,
 );

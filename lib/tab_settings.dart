@@ -24,7 +24,7 @@ class _TabSettingsState extends State<TabSettings> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text("Clear data", style: kLapButtonStyle),
+              Text("Clear data", style: kSettingStyle),
               RaisedButton(
                 child: Text('CLEAR'),
                 onPressed: () {
@@ -40,7 +40,7 @@ class _TabSettingsState extends State<TabSettings> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text("Automatic lap marking (GPS)", style: kLapButtonStyle),
+              Text("Automatic lap marking (GPS)", style: kSettingStyle),
               Switch(
                 value: myRaceData.isAutoLapMark,
                 onChanged: (bool newValue) {
@@ -58,7 +58,7 @@ class _TabSettingsState extends State<TabSettings> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text("Simulate GPS data", style: kLapButtonStyle),
+              Text("Simulate GPS data", style: kSettingStyle),
               Switch(
                 value: myRaceData.isSimulatedData,
                 onChanged: (bool newValue) {
@@ -76,7 +76,7 @@ class _TabSettingsState extends State<TabSettings> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text("GPS update trigger:  DISTANCE", style: kLapButtonStyle),
+              Text("GPS update trigger:  DISTANCE", style: kSettingStyle),
               Switch(
                 value: myRaceData.isTimedUpdates,
                 onChanged: (bool newValue) {
@@ -85,7 +85,7 @@ class _TabSettingsState extends State<TabSettings> {
                   });
                 },
               ),
-              Text("TIME", style: kLapButtonStyle),
+              Text("TIME", style: kSettingStyle),
             ],
           ),
           Divider(
@@ -95,7 +95,7 @@ class _TabSettingsState extends State<TabSettings> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text("Dark theme (requires app restart)", style: kLapButtonStyle),
+              Text("Dark theme (requires app restart)", style: kSettingStyle),
               Switch(
                 value: myRaceData.isDarkTheme,
                 onChanged: (bool newValue) {

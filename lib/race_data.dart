@@ -120,7 +120,7 @@ class RaceData extends ChangeNotifier {
       if (isRunning) {
         _updateElapsedTime(reset: false);
         if (isSimulatedData) {
-          _addPosition(simulateGPS(elapsedTime));
+          _addPosition(_simulateGPS(elapsedTime));
         }
         notifyListeners();
       } else {
@@ -172,15 +172,15 @@ class RaceData extends ChangeNotifier {
     notifyListeners();
   }
 
-  Position simulateGPS(int eTime) {
+  Position _simulateGPS(int eTime) {
     // Simulates a circular path which passes through the start point
     const double excursion = 0.001;
     double deg2rad = pi / 180.0;
     double t = eTime.toDouble();
     // Create an elliptical trajectory with speed variation too
-    double x = sin(t * 6 * deg2rad);
-    double y = -cos(t * 6 * deg2rad);
-    double s = 80 + 20 * cos(t * 6 * deg2rad);
+    double x = sin(t * 12 * deg2rad);
+    double y = 1 - cos(t * 12 * deg2rad);
+    double s = 80 + 20 * cos(t * 24 * deg2rad);
     double lat = startPosition.latitude + excursion * y;
     double long = startPosition.longitude + 2.5 * excursion * x;
     Position simPosition = Position(
