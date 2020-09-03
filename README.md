@@ -13,3 +13,8 @@ crossing the starting line is still To Be Developed.
 A map display of recorded positions, speeds, and timestamps is available.
 
 There is no saving to disk or cloud yet.
+
+## Credits
+
+Initial development: Mark Leavitt, Wearable Health Labs, LLC
+Custom app logo: Carolyn Leavitt
