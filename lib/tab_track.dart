@@ -80,6 +80,10 @@ class _TabTrackState extends State<TabTrack> {
                 .lapMarkers[lapToView]
                 .values
                 .toSet(),
+            polylines: Provider.of<RaceData>(context)
+                .polyLines[lapToView]
+                .values
+                .toSet(),
           ),
         ),
       ],

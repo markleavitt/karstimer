@@ -35,7 +35,8 @@ class RaceData extends ChangeNotifier {
   List<Position> racePositions = [];
   List<_LapStats> lapStats = [];
   List<Map<String, Marker>> lapMarkers = [{}, {}];
-  // Note: lapMarkers index corresponds to Lap Number, entry 0 is ignored
+  List<Map<String, Polyline>> polyLines = [{}, {}];
+  // Note: lapMarkers and polylines index corresponds to Lap Number, entry 0 is ignored
 
   Future<bool> initialize() async {
     try {
@@ -153,8 +154,16 @@ class RaceData extends ChangeNotifier {
   }
 
   void _addPosition(Position newPosition) {
-    // Add to overall race data
+    // Save previous position and speed
+    Position previousPosition = newPosition;
+    double previousSpeed = newPosition.speed;
+    if (racePositions.length > 0) {
+      previousPosition = racePositions.last;
+      previousSpeed = racePositions.last.speed;
+    }
     racePositions.add(newPosition);
+    //print('previous: $previousPosition');
+    //print('new: $newPosition');
     // Build marker for this position
     final newMarker = Marker(
       markerId: MarkerId(elapsedTimeString),
@@ -163,11 +172,27 @@ class RaceData extends ChangeNotifier {
           title:
               'L:$currentLapNumber ET: $elapsedTimeString Spd: ${newPosition.speed.toStringAsFixed(0)} mph'),
     );
+    // Calculate accel/decel and corresponding color
+    int speedChange = (newPosition.speed - previousPosition.speed).toInt();
+    Color speedColor = Color.fromARGB(255, 255 - speedChange, speedChange, 0);
+
+    final newPolyline = Polyline(
+      polylineId: PolylineId(elapsedTimeString),
+      visible: true,
+      color: speedColor,
+      points: [
+        LatLng(previousPosition.latitude, previousPosition.longitude),
+        LatLng(newPosition.latitude, newPosition.longitude),
+      ],
+    );
+
     // Add marker to map for this lap (note entry 0 in list is not used)
     while (currentLapNumber > lapMarkers.length - 1) {
-      lapMarkers.add({}); // Add an empty map for this lap
+      lapMarkers.add({}); // Add an empty lapMarkers map for this lap
+      polyLines.add({}); // Add empty polyLines map for this lap
     }
     lapMarkers[currentLapNumber][elapsedTimeString] = newMarker;
+    polyLines[currentLapNumber][elapsedTimeString] = newPolyline;
   }
 
   Future<void> _stop() async {
