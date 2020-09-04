@@ -165,15 +165,24 @@ class RaceData extends ChangeNotifier {
     // Build marker for this position
     final newMarker = Marker(
       markerId: MarkerId(elapsedTimeString),
+      icon: BitmapDescriptor.defaultMarkerWithHue(255),
+      alpha: 0.25,
       position: LatLng(newPosition.latitude, newPosition.longitude),
       infoWindow: InfoWindow(
           title:
               'L:$currentLapNumber ET: $elapsedTimeString Spd: ${newPosition.speed.toStringAsFixed(0)} mph'),
     );
     // Calculate accel/decel and corresponding color
-    int speedChange = (newPosition.speed - previousPosition.speed).toInt();
+    double speedChange = (newPosition.speed - previousPosition.speed);
+    double colorChange = 60.0 + 8.0 * speedChange;
+    if (colorChange < 0.0) {
+      colorChange = 0.0;
+    }
+    if (colorChange > 180.0) {
+      colorChange = 180.0;
+    }
     // Note that acceleration only computes if GPS updates are timed (not position based)
-    Color speedColor = Color.fromARGB(255, 255 - speedChange, speedChange, 0);
+    Color speedColor = HSVColor.fromAHSV(1.0, colorChange, 1.0, 1.0).toColor();
     final newPolyline = Polyline(
       polylineId: PolylineId(elapsedTimeString),
       visible: true,
