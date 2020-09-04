@@ -162,8 +162,6 @@ class RaceData extends ChangeNotifier {
       previousSpeed = racePositions.last.speed;
     }
     racePositions.add(newPosition);
-    //print('previous: $previousPosition');
-    //print('new: $newPosition');
     // Build marker for this position
     final newMarker = Marker(
       markerId: MarkerId(elapsedTimeString),
@@ -174,8 +172,8 @@ class RaceData extends ChangeNotifier {
     );
     // Calculate accel/decel and corresponding color
     int speedChange = (newPosition.speed - previousPosition.speed).toInt();
+    // Note that acceleration only computes if GPS updates are timed (not position based)
     Color speedColor = Color.fromARGB(255, 255 - speedChange, speedChange, 0);
-
     final newPolyline = Polyline(
       polylineId: PolylineId(elapsedTimeString),
       visible: true,
@@ -185,14 +183,16 @@ class RaceData extends ChangeNotifier {
         LatLng(newPosition.latitude, newPosition.longitude),
       ],
     );
-
     // Add marker to map for this lap (note entry 0 in list is not used)
     while (currentLapNumber > lapMarkers.length - 1) {
       lapMarkers.add({}); // Add an empty lapMarkers map for this lap
       polyLines.add({}); // Add empty polyLines map for this lap
     }
     lapMarkers[currentLapNumber][elapsedTimeString] = newMarker;
-    polyLines[currentLapNumber][elapsedTimeString] = newPolyline;
+    // Add a polyline if there are at least 2 markers for this lap
+    if (lapMarkers[currentLapNumber].length > 1) {
+      polyLines[currentLapNumber][elapsedTimeString] = newPolyline;
+    }
   }
 
   Future<void> _stop() async {
