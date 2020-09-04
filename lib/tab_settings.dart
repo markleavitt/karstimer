@@ -109,6 +109,18 @@ class _TabSettingsState extends State<TabSettings> {
           Divider(
             thickness: 4,
           ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                "App version:",
+              ),
+              Text(
+                myRaceData.appVersion,
+              ),
+            ],
+          ),
         ],
       ),
     );

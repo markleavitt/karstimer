@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:package_info/package_info.dart';
 
 // Create working instance of RaceData class for global use.
 RaceData myRaceData = RaceData();
@@ -20,6 +21,7 @@ class RaceData extends ChangeNotifier {
   int elapsedTime = 0;
   int currentLapNumber = 1;
   String elapsedTimeString = '00:00';
+  String appVersion = "KarsTimer V?.?.?";
   Geolocator geolocator = Geolocator();
   final locationOptions = LocationOptions(
     accuracy: LocationAccuracy.high,
@@ -37,17 +39,21 @@ class RaceData extends ChangeNotifier {
 
   Future<bool> initialize() async {
     try {
-      // Check Geolocator permissions, get map center, return true if OK
-      GeolocationStatus geolocationStatus =
-          await geolocator.checkGeolocationPermissionStatus();
-      print('Initial geoLocationStatus was: $geolocationStatus');
-      mapCenterPosition = await geolocator.getCurrentPosition();
+      // Get app version
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      appVersion = 'KarsTimer V${packageInfo.version}';
+      print(appVersion);
       // Get shared preferences stored on disk
       prefs = await SharedPreferences.getInstance();
       isDarkTheme = prefs.getBool('isDarkTheme') ?? false;
       isAutoLapMark = prefs.getBool('isAutoLapMark') ?? false;
       isSimulatedData = prefs.getBool('isSimulatedData') ?? false;
       isTimedUpdates = prefs.getBool('isTimedUpdates') ?? true;
+      // Check Geolocator permissions, get map center, return true if OK
+      GeolocationStatus geolocationStatus =
+          await geolocator.checkGeolocationPermissionStatus();
+      print('Initial geoLocationStatus was: $geolocationStatus');
+      mapCenterPosition = await geolocator.getCurrentPosition();
       return (geolocationStatus == GeolocationStatus.granted);
     } catch (e) {
       print('Geolocator error: $e');
