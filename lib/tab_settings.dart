@@ -58,6 +58,31 @@ class _TabSettingsState extends State<TabSettings> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Expanded(
+                  child: Text('Colorize map track with accel/decel data',
+                      style: kSettingStyle)),
+              Expanded(
+                child: Slider(
+                  value: myRaceData.colorSensAccel,
+                  min: 0.0,
+                  max: 10.0,
+                  divisions: 5,
+                  onChanged: (double newValue) {
+                    setState(() {
+                      myRaceData.setColorSensAccel(newValue);
+                    });
+                  },
+                ),
+              )
+            ],
+          ),
+          Divider(
+            thickness: 4,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
               Text("Simulate GPS data", style: kSettingStyle),
               Switch(
                 value: myRaceData.isSimulatedData,

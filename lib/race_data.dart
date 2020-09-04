@@ -17,6 +17,7 @@ class RaceData extends ChangeNotifier {
   bool isAutoLapMark = false;
   bool isSimulatedData = false;
   bool isTimedUpdates = true;
+  double colorSensAccel = 6.0;
   int distanceFilter = 3;
   int elapsedTime = 0;
   int currentLapNumber = 1;
@@ -50,6 +51,7 @@ class RaceData extends ChangeNotifier {
       isAutoLapMark = prefs.getBool('isAutoLapMark') ?? false;
       isSimulatedData = prefs.getBool('isSimulatedData') ?? false;
       isTimedUpdates = prefs.getBool('isTimedUpdates') ?? true;
+      colorSensAccel = prefs.getDouble('colorSensAccel') ?? 6.0;
       // Check Geolocator permissions, get map center, return true if OK
       GeolocationStatus geolocationStatus =
           await geolocator.checkGeolocationPermissionStatus();
@@ -101,6 +103,11 @@ class RaceData extends ChangeNotifier {
   void setIsTimedUpdates(bool setting) async {
     isTimedUpdates = setting;
     await prefs.setBool('isTimedUpdates', isTimedUpdates);
+  }
+
+  void setColorSensAccel(double setting) async {
+    colorSensAccel = setting;
+    await prefs.setIntDouble('colorSensAccel', colorSensAccel);
   }
 
   // Following methods are for internal use only
@@ -174,15 +181,23 @@ class RaceData extends ChangeNotifier {
     );
     // Calculate accel/decel and corresponding color
     double speedChange = (newPosition.speed - previousPosition.speed);
-    double colorChange = 60.0 + 8.0 * speedChange;
+    double colorChange = 60.0 + colorSensAccel * speedChange;
     if (colorChange < 0.0) {
       colorChange = 0.0;
     }
     if (colorChange > 180.0) {
       colorChange = 180.0;
     }
+    double colorValue = 0.5 + colorChange / 60.0;
+    if (colorValue < 0) {
+      colorValue = 0.0;
+    }
+    if (colorValue > 1.0) {
+      colorValue = 1.0;
+    }
     // Note that acceleration only computes if GPS updates are timed (not position based)
-    Color speedColor = HSVColor.fromAHSV(1.0, colorChange, 1.0, 1.0).toColor();
+    Color speedColor =
+        HSVColor.fromAHSV(1.0, colorChange, 1.0, colorValue).toColor();
     final newPolyline = Polyline(
       polylineId: PolylineId(elapsedTimeString),
       visible: true,
