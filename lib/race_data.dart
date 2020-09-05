@@ -29,6 +29,7 @@ class RaceData extends ChangeNotifier {
     distanceFilter: 0,
     // Using 0 gives timed 1 sec updates
   );
+  BitmapDescriptor flagIcon;
 
   StreamSubscription<Position> positionStreamSubscription;
   Position mapCenterPosition;
@@ -52,6 +53,9 @@ class RaceData extends ChangeNotifier {
       isSimulatedData = prefs.getBool('isSimulatedData') ?? false;
       isTimedUpdates = prefs.getBool('isTimedUpdates') ?? true;
       colorSensAccel = prefs.getDouble('colorSensAccel') ?? 6.0;
+      // Prepare the flagIcon for mapping
+      flagIcon = await BitmapDescriptor.fromAssetImage(
+          ImageConfiguration(devicePixelRatio: 2.5), 'images/flag.png');
       // Check Geolocator permissions, get map center, return true if OK
       GeolocationStatus geolocationStatus =
           await geolocator.checkGeolocationPermissionStatus();
@@ -172,7 +176,7 @@ class RaceData extends ChangeNotifier {
     // Build marker for this position
     final newMarker = Marker(
       markerId: MarkerId(elapsedTimeString),
-      icon: BitmapDescriptor.defaultMarkerWithHue(255),
+      icon: flagIcon,
       alpha: 0.25,
       position: LatLng(newPosition.latitude, newPosition.longitude),
       infoWindow: InfoWindow(

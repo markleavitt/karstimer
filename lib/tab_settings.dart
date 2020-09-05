@@ -17,9 +17,7 @@ class _TabSettingsState extends State<TabSettings> {
       padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 20.0),
       child: Column(
         children: [
-          Divider(
-            thickness: 4,
-          ),
+          MyDivider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -33,9 +31,7 @@ class _TabSettingsState extends State<TabSettings> {
               )
             ],
           ),
-          Divider(
-            thickness: 4,
-          ),
+          MyDivider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -51,9 +47,7 @@ class _TabSettingsState extends State<TabSettings> {
               ),
             ],
           ),
-          Divider(
-            thickness: 4,
-          ),
+          MyDivider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -76,27 +70,7 @@ class _TabSettingsState extends State<TabSettings> {
               )
             ],
           ),
-          Divider(
-            thickness: 4,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text("Simulate GPS data", style: kSettingStyle),
-              Switch(
-                value: myRaceData.isSimulatedData,
-                onChanged: (bool newValue) {
-                  setState(() {
-                    myRaceData.setIsSimulatedData(newValue);
-                  });
-                },
-              ),
-            ],
-          ),
-          Divider(
-            thickness: 4,
-          ),
+          MyDivider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -113,9 +87,23 @@ class _TabSettingsState extends State<TabSettings> {
               Text("TIME", style: kSettingStyle),
             ],
           ),
-          Divider(
-            thickness: 4,
+          MyDivider(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text("Simulate GPS data", style: kSettingStyle),
+              Switch(
+                value: myRaceData.isSimulatedData,
+                onChanged: (bool newValue) {
+                  setState(() {
+                    myRaceData.setIsSimulatedData(newValue);
+                  });
+                },
+              ),
+            ],
           ),
+          MyDivider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -131,9 +119,7 @@ class _TabSettingsState extends State<TabSettings> {
               ),
             ],
           ),
-          Divider(
-            thickness: 4,
-          ),
+          MyDivider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -148,6 +134,16 @@ class _TabSettingsState extends State<TabSettings> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class MyDivider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Divider(
+      height: 3,
+      thickness: 2,
     );
   }
 }
