@@ -52,8 +52,24 @@ class _TabSettingsState extends State<TabSettings> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Text("Map: show position flags", style: kSettingStyle),
+              Switch(
+                value: myRaceData.isShowMapFlags,
+                onChanged: (bool newValue) {
+                  setState(() {
+                    myRaceData.setIsShowMapFlags(newValue);
+                  });
+                },
+              ),
+            ],
+          ),
+          MyDivider(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
               Expanded(
-                  child: Text('Colorize map track with accel/decel data',
+                  child: Text('Map: colorize with accel/decel data',
                       style: kSettingStyle)),
               Expanded(
                 child: Slider(

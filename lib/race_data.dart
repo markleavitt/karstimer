@@ -17,6 +17,7 @@ class RaceData extends ChangeNotifier {
   bool isAutoLapMark = false;
   bool isSimulatedData = false;
   bool isTimedUpdates = true;
+  bool isShowMapFlags = true;
   double colorSensAccel = 6.0;
   int distanceFilter = 3;
   int elapsedTime = 0;
@@ -53,6 +54,7 @@ class RaceData extends ChangeNotifier {
       isSimulatedData = prefs.getBool('isSimulatedData') ?? false;
       isTimedUpdates = prefs.getBool('isTimedUpdates') ?? true;
       colorSensAccel = prefs.getDouble('colorSensAccel') ?? 6.0;
+      isShowMapFlags = prefs.getBool('isShowMapFlags') ?? true;
       // Prepare the flagIcon for mapping
       flagIcon = await BitmapDescriptor.fromAssetImage(
           ImageConfiguration(devicePixelRatio: 2.5), 'images/flag.png');
@@ -85,6 +87,7 @@ class RaceData extends ChangeNotifier {
     racePositions = [];
     lapStats = [];
     lapMarkers = [{}, {}];
+    polyLines = [{}, {}];
     currentLapNumber = 1;
     _updateElapsedTime(reset: true);
   }
@@ -112,6 +115,11 @@ class RaceData extends ChangeNotifier {
   void setColorSensAccel(double setting) async {
     colorSensAccel = setting;
     await prefs.setIntDouble('colorSensAccel', colorSensAccel);
+  }
+
+  void setIsShowMapFlags(bool setting) async {
+    isShowMapFlags = setting;
+    await prefs.setBool('isShowMapFlags', isShowMapFlags);
   }
 
   // Following methods are for internal use only
@@ -177,7 +185,7 @@ class RaceData extends ChangeNotifier {
     final newMarker = Marker(
       markerId: MarkerId(elapsedTimeString),
       icon: flagIcon,
-      alpha: 0.25,
+      alpha: isShowMapFlags ? 0.25 : 0,
       position: LatLng(newPosition.latitude, newPosition.longitude),
       infoWindow: InfoWindow(
           title:
@@ -205,6 +213,9 @@ class RaceData extends ChangeNotifier {
     final newPolyline = Polyline(
       polylineId: PolylineId(elapsedTimeString),
       visible: true,
+      width: 6,
+      startCap: Cap.roundCap,
+      endCap: Cap.roundCap,
       color: speedColor,
       points: [
         LatLng(previousPosition.latitude, previousPosition.longitude),
