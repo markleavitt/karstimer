@@ -27,8 +27,8 @@ class RaceData extends ChangeNotifier {
   Geolocator geolocator = Geolocator();
   final locationOptions = LocationOptions(
     accuracy: LocationAccuracy.high,
-    distanceFilter: 0,
-    // Using 0 gives timed 1 sec updates
+    distanceFilter: 10,
+    timeInterval: 1000,
   );
   BitmapDescriptor flagIcon;
 
@@ -100,6 +100,7 @@ class RaceData extends ChangeNotifier {
   void setIsAutoLapMark(bool setting) async {
     isAutoLapMark = setting;
     await prefs.setBool('isAutoLapMark', isAutoLapMark);
+    notifyListeners();
   }
 
   void setIsSimulatedData(bool setting) async {
@@ -228,9 +229,58 @@ class RaceData extends ChangeNotifier {
       polyLines.add({}); // Add empty polyLines map for this lap
     }
     lapMarkers[currentLapNumber][elapsedTimeString] = newMarker;
-    // Add a polyline if there are at least 2 markers for this lap
-    if (lapMarkers[currentLapNumber].length > 1) {
-      polyLines[currentLapNumber][elapsedTimeString] = newPolyline;
+    polyLines[currentLapNumber][elapsedTimeString] = newPolyline;
+    // Check for automatic lap crossings
+    if (isAutoLapMark) {
+      checkLapCrossing(previousPosition, newPosition);
+    }
+  }
+
+  void checkLapCrossing(Position p1, Position p2) async {
+    const double maxRange = 100.0; // Meters distance
+    const double minRange = 10.0; // Meters distance
+    // If this lap has just started, go no further
+    if (lapMarkers[currentLapNumber].length < 10) {
+      return;
+    }
+    ;
+    // Calculate distance from start point to previous and current point
+    final double distanceToP1 = await geolocator.distanceBetween(
+        startPosition.latitude,
+        startPosition.longitude,
+        p1.latitude,
+        p1.longitude);
+    final double distanceToP2 = await geolocator.distanceBetween(
+        startPosition.latitude,
+        startPosition.longitude,
+        p2.latitude,
+        p2.longitude);
+    // If neither location is within range of the start point, no need to proceed further
+    if (distanceToP1 > maxRange && distanceToP2 > maxRange) {
+      return;
+    }
+    ;
+    // If newest position is very near the start point, declare a new lap and return
+    if (distanceToP2 < minRange) {
+      print('Lap completed by being in close range to starting point');
+      markLap();
+      return;
+    }
+    // At least one point is in range, so continue the calculation with bearings
+    final double bearingToP1 = await geolocator.bearingBetween(
+        startPosition.latitude,
+        startPosition.longitude,
+        p1.latitude,
+        p1.longitude);
+    final double bearingToP2 = await geolocator.bearingBetween(
+        startPosition.latitude,
+        startPosition.longitude,
+        p2.latitude,
+        p2.longitude);
+    // If points are in opposite directions from start point, mark the lap
+    if ((bearingToP1 - bearingToP2).abs() % 360.0 > 120) {
+      print('Lap completed by sweeping past starting point');
+      markLap();
     }
   }
 

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:karstimer/race_data.dart';
 import 'tab_track.dart';
+import 'tab_best_time.dart';
 import 'tab_lap_timer.dart';
 import 'tab_settings.dart';
 import 'race_data.dart';
@@ -22,12 +23,13 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         theme: myRaceData.isDarkTheme ? ThemeData.dark() : ThemeData.light(),
         home: DefaultTabController(
-          length: 3,
+          length: 4,
           child: Scaffold(
             appBar: AppBar(
               bottom: TabBar(
                 tabs: [
                   Tab(icon: Icon(Icons.timer, size: 40.0)),
+                  Tab(icon: Icon(Icons.list, size: 40.0)),
                   Tab(icon: Icon(Icons.location_on, size: 40.0)),
                   Tab(icon: Icon(Icons.settings, size: 40.0))
                 ],
@@ -44,6 +46,7 @@ class MyApp extends StatelessWidget {
             ),
             body: TabBarView(
               children: [
+                TabBestTime(),
                 TabLapTimer(),
                 TabTrack(),
                 TabSettings(),
