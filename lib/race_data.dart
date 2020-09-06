@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:karstimer/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:package_info/package_info.dart';
 
@@ -26,6 +27,8 @@ class RaceData extends ChangeNotifier {
   int bestLapNumber;
   int minAcceptableLapTime = 0;
   int maxAcceptableLapTime = 600;
+  double currentSpeedMph = 0;
+  double lapTopSpeedMph = 0;
   String elapsedTimeString = '00:00';
   String lastLapTimeString = '  :  ';
   String bestLapTimeString = '  :  ';
@@ -88,7 +91,9 @@ class RaceData extends ChangeNotifier {
     if (elapsedTime >= minAcceptableLapTime &&
         elapsedTime <= maxAcceptableLapTime) {
       lapStats.insert(
-          0, _LapStats(currentLapNumber, elapsedTime, elapsedTimeString));
+          0,
+          _LapStats(currentLapNumber, lapTopSpeedMph, elapsedTime,
+              elapsedTimeString));
       int lastLapTime = elapsedTime;
       lastLapTimeString = etToString(lastLapTime);
       if (lastLapTime < bestLapTime) {
@@ -113,6 +118,8 @@ class RaceData extends ChangeNotifier {
     lastLapTimeString = '  :  ';
     bestLapTimeString = '  :  ';
     bestLapTime = 9999;
+    currentSpeedMph = 0;
+    lapTopSpeedMph = 0;
   }
 
   void setIsDarkTheme(bool setting) async {
@@ -170,6 +177,7 @@ class RaceData extends ChangeNotifier {
     } else {
       elapsedTime = 0;
       elapsedTimeString = etToString(elapsedTime);
+      lapTopSpeedMph = 0;
     }
   }
 
@@ -226,8 +234,13 @@ class RaceData extends ChangeNotifier {
       position: LatLng(newPosition.latitude, newPosition.longitude),
       infoWindow: InfoWindow(
           title:
-              'L:$currentLapNumber ET: $elapsedTimeString Spd: ${newPosition.speed.toStringAsFixed(0)} mph'),
+              'L:$currentLapNumber ET: $elapsedTimeString Spd: ${(newPosition.speed * 2.237).toStringAsFixed(0)} mph'),
     );
+    // Convert speed to mph and record top speed for this lap
+    currentSpeedMph = newPosition.speed * mpsToMph;
+    if (currentSpeedMph > lapTopSpeedMph) {
+      lapTopSpeedMph = currentSpeedMph;
+    }
     // Calculate accel/decel and corresponding color
     double speedChange = (newPosition.speed - previousPosition.speed);
     double colorChange = 60.0 + colorSensAccel * speedChange;
@@ -312,8 +325,13 @@ class RaceData extends ChangeNotifier {
         p2.latitude,
         p2.longitude);
     // If points are in opposite directions from start point, mark the lap
-    if ((bearingToP1 - bearingToP2).abs() % 360.0 > 120) {
-      print('Lap completed by sweeping past starting point');
+    // Calculate raw angle between bearings (discard sign)
+    double rawAngle = (bearingToP1 - bearingToP2).abs();
+    // Correct for angles > 180
+    double correctedAngle = (rawAngle <= 180.0) ? rawAngle : 360.0 - rawAngle;
+    if (correctedAngle > 90.0) {
+      print(
+          'Lap completed by bearing sweeping from $bearingToP1 to $bearingToP2');
       markLap();
     }
   }
@@ -335,22 +353,29 @@ class RaceData extends ChangeNotifier {
     const double degPerSec = 12.0; // Degrees around the ellipse per second
     double deg2rad = pi / 180.0;
     double t = eTime.toDouble();
-    // Create an elliptical trajectory with speed variation too
+    // Create an elliptical trajectory
     double x = sin(t * degPerSec * deg2rad);
     double y =
         1 - cos(t * degPerSec * deg2rad); // Start at bottom center, go CCW
-    double s = 80.0 + 20.0 * cos(t * 2.0 * degPerSec * deg2rad);
-    double lat = startPosition.latitude + minorAxis * y;
-    double long = startPosition.longitude + majorAxis * x;
+    // Create speed in meters per second
+    double mps = 40.0 + 10.0 * cos(t * 2.0 * degPerSec * deg2rad);
+    // Create lat/long and inject 10% noise
+    double lat = startPosition.latitude +
+        minorAxis * y +
+        minorAxis * 0.05 * Random().nextDouble();
+    double long = startPosition.longitude +
+        majorAxis * x +
+        majorAxis * 0.05 * Random().nextDouble();
     Position simPosition = Position(
-        latitude: lat, longitude: long, timestamp: DateTime.now(), speed: s);
+        latitude: lat, longitude: long, timestamp: DateTime.now(), speed: mps);
     return simPosition;
   }
 }
 
 class _LapStats {
-  _LapStats(this.lapNumber, this.lapTime, this.lapTimeString);
+  _LapStats(this.lapNumber, this.lapTopSpeed, this.lapTime, this.lapTimeString);
   final int lapNumber;
+  final double lapTopSpeed;
   final int lapTime;
   final String lapTimeString;
 }

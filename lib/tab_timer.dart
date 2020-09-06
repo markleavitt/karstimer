@@ -141,10 +141,19 @@ class _Header extends StatelessWidget {
                   ),
                 ),
                 Text(
+                  '${Provider.of<RaceData>(context).currentSpeedMph.toStringAsFixed(0)} mph',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 24.0,
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
                   Provider.of<RaceData>(context).elapsedTimeString,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 32.0,
+                    fontSize: 24.0,
                     fontStyle: FontStyle.italic,
                     fontWeight: FontWeight.bold,
                   ),

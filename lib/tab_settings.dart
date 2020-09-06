@@ -124,8 +124,8 @@ class _TabSettingsState extends State<TabSettings> {
                 child: Slider(
                   value: myRaceData.colorSensAccel,
                   min: 0.0,
-                  max: 10.0,
-                  divisions: 5,
+                  max: 12.0,
+                  divisions: 6,
                   onChanged: (double newValue) {
                     setState(() {
                       myRaceData.setColorSensAccel(newValue);
@@ -157,7 +157,7 @@ class _TabSettingsState extends State<TabSettings> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text("Simulate GPS updates", style: kSettingStyle),
+              Text("Simulator (GPS updates + noise)", style: kSettingStyle),
               Switch(
                 value: myRaceData.isSimulatedData,
                 onChanged: (bool newValue) {

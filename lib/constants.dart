@@ -25,3 +25,5 @@ const TextStyle kSettingStyle = TextStyle(
   fontSize: 14.0,
   fontWeight: FontWeight.bold,
 );
+
+const double mpsToMph = 2.237;
