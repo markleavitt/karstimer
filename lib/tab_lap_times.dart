@@ -4,12 +4,12 @@ import 'package:provider/provider.dart';
 import 'race_data.dart';
 import 'constants.dart';
 
-class TabLapTimer extends StatefulWidget {
+class TabLapTimes extends StatefulWidget {
   @override
-  _TabLapTimerState createState() => _TabLapTimerState();
+  _TabLapTimesState createState() => _TabLapTimesState();
 }
 
-class _TabLapTimerState extends State<TabLapTimer> {
+class _TabLapTimesState extends State<TabLapTimes> {
   //ScrollController _myListScrollController = ScrollController();
   @override
   Widget build(BuildContext context) {

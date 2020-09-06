@@ -3,8 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:karstimer/race_data.dart';
 import 'tab_track.dart';
-import 'tab_best_time.dart';
-import 'tab_lap_timer.dart';
+import 'tab_timer.dart';
+import 'tab_lap_times.dart';
 import 'tab_settings.dart';
 import 'race_data.dart';
 import 'package:provider/provider.dart';
@@ -46,8 +46,8 @@ class MyApp extends StatelessWidget {
             ),
             body: TabBarView(
               children: [
-                TabBestTime(),
-                TabLapTimer(),
+                TabTimer(),
+                TabLapTimes(),
                 TabTrack(),
                 TabSettings(),
               ],

@@ -22,7 +22,11 @@ class RaceData extends ChangeNotifier {
   int distanceFilter = 3;
   int elapsedTime = 0;
   int currentLapNumber = 1;
+  int bestLapTime = 9999;
+  int bestLapNumber;
   String elapsedTimeString = '00:00';
+  String lastLapTimeString = '  :  ';
+  String bestLapTimeString = '  :  ';
   String appVersion = "KarsTimer V?.?.?";
   Geolocator geolocator = Geolocator();
   final locationOptions = LocationOptions(
@@ -78,6 +82,15 @@ class RaceData extends ChangeNotifier {
   void markLap() {
     lapStats.insert(
         0, _LapStats(currentLapNumber, elapsedTime, elapsedTimeString));
+    int lastLapTime = elapsedTime;
+    lastLapTimeString =
+        '${(lastLapTime ~/ 60).toString().padLeft(2, '0')}:${(lastLapTime % 60).toString().padLeft(2, '0')}';
+    if (lastLapTime < bestLapTime) {
+      bestLapTime = lastLapTime;
+      bestLapNumber = currentLapNumber;
+      bestLapTimeString =
+          '${(bestLapTime ~/ 60).toString().padLeft(2, '0')}:${(bestLapTime % 60).toString().padLeft(2, '0')}';
+    }
     _updateElapsedTime(reset: true);
     currentLapNumber++;
     notifyListeners();
@@ -176,10 +189,8 @@ class RaceData extends ChangeNotifier {
   void _addPosition(Position newPosition) {
     // Save previous position and speed
     Position previousPosition = newPosition;
-    double previousSpeed = newPosition.speed;
     if (racePositions.length > 0) {
       previousPosition = racePositions.last;
-      previousSpeed = racePositions.last.speed;
     }
     racePositions.add(newPosition);
     // Build marker for this position
@@ -243,7 +254,6 @@ class RaceData extends ChangeNotifier {
     if (lapMarkers[currentLapNumber].length < 10) {
       return;
     }
-    ;
     // Calculate distance from start point to previous and current point
     final double distanceToP1 = await geolocator.distanceBetween(
         startPosition.latitude,
@@ -259,7 +269,6 @@ class RaceData extends ChangeNotifier {
     if (distanceToP1 > maxRange && distanceToP2 > maxRange) {
       return;
     }
-    ;
     // If newest position is very near the start point, declare a new lap and return
     if (distanceToP2 < minRange) {
       print('Lap completed by being in close range to starting point');
