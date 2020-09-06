@@ -46,8 +46,8 @@ class _TabTimerState extends State<TabTimer> {
               padding: const EdgeInsets.all(12.0),
               child: Text(
                 Provider.of<RaceData>(context).isAutoLapMark
-                    ? 'Mark Lap \n(Override GPS)'
-                    : 'Mark Lap \n(Manual Mode)',
+                    ? 'MARK LAP\n(Override GPS)'
+                    : 'MARK LAP\n(Manual Mode)',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   //color: Colors.white,

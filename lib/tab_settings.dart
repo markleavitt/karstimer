@@ -33,7 +33,7 @@ class _TabSettingsState extends State<TabSettings> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text("Automatic lap marking (GPS)", style: kSettingStyle),
+              Text("LAPS: automatic GPS marking", style: kSettingStyle),
               Switch(
                 value: myRaceData.isAutoLapMark,
                 onChanged: (bool newValue) {
@@ -44,12 +44,64 @@ class _TabSettingsState extends State<TabSettings> {
               ),
             ],
           ),
+          //MyDivider(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Text(
+                  'Discard if\nless than ${myRaceData.etToString(myRaceData.minAcceptableLapTime)}',
+                  style: kSettingStyle,
+                ),
+              ),
+              Expanded(
+                child: Slider(
+                  value: myRaceData.minAcceptableLapTime.toDouble(),
+                  min: 0.0,
+                  max: 600.0,
+                  divisions: 20,
+                  onChanged: (double newValue) {
+                    setState(() {
+                      myRaceData.setMinAcceptableLapTime(newValue);
+                    });
+                  },
+                ),
+              )
+            ],
+          ),
+          //MyDivider(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Text(
+                  'Discard if\nmore than ${myRaceData.etToString(myRaceData.maxAcceptableLapTime)}',
+                  style: kSettingStyle,
+                ),
+              ),
+              Expanded(
+                child: Slider(
+                  value: myRaceData.maxAcceptableLapTime.toDouble(),
+                  min: 0.0,
+                  max: 600.0,
+                  divisions: 20,
+                  onChanged: (double newValue) {
+                    setState(() {
+                      myRaceData.setMaxAcceptableLapTime(newValue);
+                    });
+                  },
+                ),
+              )
+            ],
+          ),
           MyDivider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text("Map: show position flags", style: kSettingStyle),
+              Text("MAP: show position flags", style: kSettingStyle),
               Switch(
                 value: myRaceData.isShowMapFlags,
                 onChanged: (bool newValue) {
@@ -60,13 +112,13 @@ class _TabSettingsState extends State<TabSettings> {
               ),
             ],
           ),
-          MyDivider(),
+          //MyDivider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
-                  child: Text('Map: colorize with accel/decel data',
+                  child: Text('Colorize track with\naccel/decel data',
                       style: kSettingStyle)),
               Expanded(
                 child: Slider(
@@ -88,7 +140,7 @@ class _TabSettingsState extends State<TabSettings> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text("GPS update trigger:  DISTANCE", style: kSettingStyle),
+              Text("GPS: trigger on...         DISTANCE", style: kSettingStyle),
               Switch(
                 value: myRaceData.isTimedUpdates,
                 onChanged: (bool newValue) {
@@ -100,12 +152,12 @@ class _TabSettingsState extends State<TabSettings> {
               Text("TIME", style: kSettingStyle),
             ],
           ),
-          MyDivider(),
+          //MyDivider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text("Simulate GPS data", style: kSettingStyle),
+              Text("Simulate GPS updates", style: kSettingStyle),
               Switch(
                 value: myRaceData.isSimulatedData,
                 onChanged: (bool newValue) {

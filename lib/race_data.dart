@@ -24,6 +24,8 @@ class RaceData extends ChangeNotifier {
   int currentLapNumber = 1;
   int bestLapTime = 9999;
   int bestLapNumber;
+  int minAcceptableLapTime = 0;
+  int maxAcceptableLapTime = 600;
   String elapsedTimeString = '00:00';
   String lastLapTimeString = '  :  ';
   String bestLapTimeString = '  :  ';
@@ -57,8 +59,10 @@ class RaceData extends ChangeNotifier {
       isAutoLapMark = prefs.getBool('isAutoLapMark') ?? false;
       isSimulatedData = prefs.getBool('isSimulatedData') ?? false;
       isTimedUpdates = prefs.getBool('isTimedUpdates') ?? true;
-      colorSensAccel = prefs.getDouble('colorSensAccel') ?? 6.0;
       isShowMapFlags = prefs.getBool('isShowMapFlags') ?? true;
+      colorSensAccel = prefs.getDouble('colorSensAccel') ?? 6.0;
+      minAcceptableLapTime = prefs.getInt('minAcceptableLapTime') ?? 0;
+      maxAcceptableLapTime = prefs.getInt('maxAcceptableLapTime') ?? 600;
       // Prepare the flagIcon for mapping
       flagIcon = await BitmapDescriptor.fromAssetImage(
           ImageConfiguration(devicePixelRatio: 2.5), 'images/flag.png');
@@ -80,19 +84,22 @@ class RaceData extends ChangeNotifier {
   }
 
   void markLap() {
-    lapStats.insert(
-        0, _LapStats(currentLapNumber, elapsedTime, elapsedTimeString));
-    int lastLapTime = elapsedTime;
-    lastLapTimeString =
-        '${(lastLapTime ~/ 60).toString().padLeft(2, '0')}:${(lastLapTime % 60).toString().padLeft(2, '0')}';
-    if (lastLapTime < bestLapTime) {
-      bestLapTime = lastLapTime;
-      bestLapNumber = currentLapNumber;
-      bestLapTimeString =
-          '${(bestLapTime ~/ 60).toString().padLeft(2, '0')}:${(bestLapTime % 60).toString().padLeft(2, '0')}';
+    // Only save this lap data if within acceptable range
+    if (elapsedTime >= minAcceptableLapTime &&
+        elapsedTime <= maxAcceptableLapTime) {
+      lapStats.insert(
+          0, _LapStats(currentLapNumber, elapsedTime, elapsedTimeString));
+      int lastLapTime = elapsedTime;
+      lastLapTimeString = etToString(lastLapTime);
+      if (lastLapTime < bestLapTime) {
+        bestLapTime = lastLapTime;
+        bestLapNumber = currentLapNumber;
+        bestLapTimeString = etToString(bestLapTime);
+      }
+      currentLapNumber++;
     }
+    // In any case, reset the elapsed time meter
     _updateElapsedTime(reset: true);
-    currentLapNumber++;
     notifyListeners();
   }
 
@@ -103,6 +110,9 @@ class RaceData extends ChangeNotifier {
     polyLines = [{}, {}];
     currentLapNumber = 1;
     _updateElapsedTime(reset: true);
+    lastLapTimeString = '  :  ';
+    bestLapTimeString = '  :  ';
+    bestLapTime = 9999;
   }
 
   void setIsDarkTheme(bool setting) async {
@@ -126,25 +136,40 @@ class RaceData extends ChangeNotifier {
     await prefs.setBool('isTimedUpdates', isTimedUpdates);
   }
 
-  void setColorSensAccel(double setting) async {
-    colorSensAccel = setting;
-    await prefs.setIntDouble('colorSensAccel', colorSensAccel);
-  }
-
   void setIsShowMapFlags(bool setting) async {
     isShowMapFlags = setting;
     await prefs.setBool('isShowMapFlags', isShowMapFlags);
+  }
+
+  void setColorSensAccel(double setting) async {
+    colorSensAccel = setting;
+    await prefs.setDouble('colorSensAccel', colorSensAccel);
+  }
+
+  void setMinAcceptableLapTime(double setting) async {
+    minAcceptableLapTime = setting.toInt();
+    await prefs.setInt('minAcceptableLapTime', minAcceptableLapTime);
+  }
+
+  void setMaxAcceptableLapTime(double setting) async {
+    maxAcceptableLapTime = setting.toInt();
+    await prefs.setInt('maxAcceptableLapTime', maxAcceptableLapTime);
+  }
+
+  String etToString(int et) {
+    return (et != null)
+        ? '${(et ~/ 60).toString().padLeft(2, '0')}:${(et % 60).toString().padLeft(2, '0')}'
+        : '  :  ';
   }
 
   // Following methods are for internal use only
   void _updateElapsedTime({bool reset}) {
     if (!reset) {
       elapsedTime += intervalSecs;
-      elapsedTimeString =
-          '${(elapsedTime ~/ 60).toString().padLeft(2, '0')}:${(elapsedTime % 60).toString().padLeft(2, '0')}';
+      elapsedTimeString = etToString(elapsedTime);
     } else {
       elapsedTime = 0;
-      elapsedTimeString = '00:00';
+      elapsedTimeString = etToString(elapsedTime);
     }
   }
 
