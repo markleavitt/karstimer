@@ -13,77 +13,80 @@ RaceData myRaceData = RaceData();
 class RaceData extends ChangeNotifier {
   final int intervalSecs = 1; // Timer will tick 1x/sec
   var prefs;
+  // These are the preference variables
   bool isDarkTheme = false;
-  bool isRunning = false;
   bool isAutoLapMark = false;
   bool isSimulatedData = false;
-  bool isTimedUpdates = true;
   bool isShowMapFlags = true;
+  int minAcceptableLapTime = 0;
+  int maxAcceptableLapTime = 600;
   double colorSensAccel = 6.0;
-  int distanceFilter = 3;
+  // Status variables
+  bool isRunning = false;
+  String locationAccuracy = 'Not ready';
+  String lastLapTrigger = "None";
   int elapsedTime = 0;
   int currentLapNumber = 1;
   int bestLapTime = 9999;
   int bestLapNumber;
-  int minAcceptableLapTime = 0;
-  int maxAcceptableLapTime = 600;
   double currentSpeedMph = 0;
   double lapTopSpeedMph = 0;
   String elapsedTimeString = '00:00';
   String lastLapTimeString = '  :  ';
   String bestLapTimeString = '  :  ';
   String appVersion = "KarsTimer V?.?.?";
+  // Geolocator object, options, and stream
   Geolocator geolocator = Geolocator();
   final locationOptions = LocationOptions(
     accuracy: LocationAccuracy.high,
-    distanceFilter: 10,
+    distanceFilter: 0,
     timeInterval: 1000,
   );
-  BitmapDescriptor flagIcon;
-
   StreamSubscription<Position> positionStreamSubscription;
-  Position mapCenterPosition;
+  // Data from the race
+  List<Position> racePositions =
+      []; // Includes time, latlng, speed, accuracy, etc
+  List<_LapStats> lapStats = []; // Laps are inserted at 0 so order is reversed
+  // Map making data
+  BitmapDescriptor flagIcon;
   Position startPosition;
-  List<Position> racePositions = [];
-  List<_LapStats> lapStats = [];
+  Position mapCenterPosition;
   List<Map<String, Marker>> lapMarkers = [{}, {}];
   List<Map<String, Polyline>> polyLines = [{}, {}];
   // Note: lapMarkers and polylines index corresponds to Lap Number, entry 0 is ignored
 
-  Future<bool> initialize() async {
-    try {
-      // Get app version
-      PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      appVersion = 'KarsTimer V${packageInfo.version}';
-      print(appVersion);
-      // Get shared preferences stored on disk
-      prefs = await SharedPreferences.getInstance();
-      isDarkTheme = prefs.getBool('isDarkTheme') ?? false;
-      isAutoLapMark = prefs.getBool('isAutoLapMark') ?? false;
-      isSimulatedData = prefs.getBool('isSimulatedData') ?? false;
-      isTimedUpdates = prefs.getBool('isTimedUpdates') ?? true;
-      isShowMapFlags = prefs.getBool('isShowMapFlags') ?? true;
-      colorSensAccel = prefs.getDouble('colorSensAccel') ?? 6.0;
-      minAcceptableLapTime = prefs.getInt('minAcceptableLapTime') ?? 0;
-      maxAcceptableLapTime = prefs.getInt('maxAcceptableLapTime') ?? 600;
-      // Prepare the flagIcon for mapping
-      flagIcon = await BitmapDescriptor.fromAssetImage(
-          ImageConfiguration(devicePixelRatio: 2.5), 'images/flag.png');
-      // Check Geolocator permissions, get map center, return true if OK
-      GeolocationStatus geolocationStatus =
-          await geolocator.checkGeolocationPermissionStatus();
-      print('Initial geoLocationStatus was: $geolocationStatus');
-      mapCenterPosition = await geolocator.getCurrentPosition();
-      return (geolocationStatus == GeolocationStatus.granted);
-    } catch (e) {
-      print('Geolocator error: $e');
-      return false;
+  Future<void> initialize() async {
+    // Get app version
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    appVersion = 'KarsTimer V${packageInfo.version}';
+    print(appVersion);
+    // Get shared preferences stored on disk
+    prefs = await SharedPreferences.getInstance();
+    isDarkTheme = prefs.getBool('isDarkTheme') ?? false;
+    isAutoLapMark = prefs.getBool('isAutoLapMark') ?? false;
+    isSimulatedData = prefs.getBool('isSimulatedData') ?? false;
+    isShowMapFlags = prefs.getBool('isShowMapFlags') ?? true;
+    colorSensAccel = prefs.getDouble('colorSensAccel') ?? 6.0;
+    minAcceptableLapTime = prefs.getInt('minAcceptableLapTime') ?? 0;
+    maxAcceptableLapTime = prefs.getInt('maxAcceptableLapTime') ?? 600;
+    // Prepare the flagIcon for mapping
+    flagIcon = await BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: 2.5), 'images/flag.png');
+    // Get current position to center map (this will also request permission)
+    mapCenterPosition = await geolocator.getCurrentPosition();
+    print('Got map center position');
+    GeolocationStatus geoLocationStatus =
+        await geolocator.checkGeolocationPermissionStatus();
+    print('Location status: $geoLocationStatus');
+    // Now subscribe to the position stream if not using simulator
+    if (!isSimulatedData) {
+      _gpsSubscribe(turnOn: true);
     }
   }
 
   void toggleState() {
     isRunning = !isRunning;
-    isRunning ? _start() : _stop();
+    isRunning ? _startRace() : _stop();
   }
 
   void markLap() {
@@ -108,12 +111,18 @@ class RaceData extends ChangeNotifier {
     notifyListeners();
   }
 
+  void clearStartingPosition() {
+    startPosition = null;
+  }
+
   void clearData() {
     racePositions = [];
     lapStats = [];
     lapMarkers = [{}, {}];
     polyLines = [{}, {}];
     currentLapNumber = 1;
+    locationAccuracy = 'unknown';
+    lastLapTrigger = 'none';
     _updateElapsedTime(reset: true);
     lastLapTimeString = '  :  ';
     bestLapTimeString = '  :  ';
@@ -136,11 +145,12 @@ class RaceData extends ChangeNotifier {
   void setIsSimulatedData(bool setting) async {
     isSimulatedData = setting;
     await prefs.setBool('isSimulatedData', isSimulatedData);
-  }
-
-  void setIsTimedUpdates(bool setting) async {
-    isTimedUpdates = setting;
-    await prefs.setBool('isTimedUpdates', isTimedUpdates);
+    if (isSimulatedData) {
+      _gpsSubscribe(turnOn: false);
+    } else {
+      _gpsSubscribe(turnOn: true);
+    }
+    notifyListeners();
   }
 
   void setIsShowMapFlags(bool setting) async {
@@ -181,19 +191,21 @@ class RaceData extends ChangeNotifier {
     }
   }
 
-  Future<bool> _start() async {
+  Future<bool> _startRace() async {
     isRunning = true;
     notifyListeners();
-    // Get and save starting position
-    startPosition = await geolocator.getCurrentPosition();
-    print('Starting position is: $startPosition');
+    // If no previous starting position, record current position as start
+    if (startPosition == null) {
+      startPosition = await geolocator.getCurrentPosition();
+      print('Starting position is: $startPosition');
+    }
     // Start the periodic timer
     print('timer started');
     Timer.periodic(Duration(seconds: intervalSecs), (timer) {
       if (isRunning) {
         _updateElapsedTime(reset: false);
         if (isSimulatedData) {
-          _addPosition(_simulateGPS(elapsedTime));
+          _processPositionUpdate(_simulateGPS(elapsedTime));
         }
         notifyListeners();
       } else {
@@ -201,25 +213,40 @@ class RaceData extends ChangeNotifier {
         print('timer stopped');
       }
     });
-    // Configure locationUpdateOptions for timed (0) or distance
-    final locationUpdateOptions = LocationOptions(
-      accuracy: LocationAccuracy.high,
-      distanceFilter: (isTimedUpdates ? 0 : distanceFilter),
-    );
-    // Finally, start subscribing to the position stream
-    if (!isSimulatedData) {
-      positionStreamSubscription =
-          geolocator.getPositionStream(locationUpdateOptions).listen((newPos) {
-        _addPosition(newPos);
-        notifyListeners();
-      });
-    }
-    print(
-        'GPS subscription started in ${isTimedUpdates ? 'timed' : 'distance'} mode');
     return true;
   }
 
-  void _addPosition(Position newPosition) {
+  void _gpsSubscribe({bool turnOn}) async {
+    if (turnOn) {
+      if (positionStreamSubscription == null) {
+        positionStreamSubscription =
+            geolocator.getPositionStream(locationOptions).listen((newPos) {
+          _processPositionUpdate(newPos);
+        });
+        print('Subscribed to GPS stream');
+      }
+    } else {
+      if (positionStreamSubscription != null) {
+        await positionStreamSubscription.cancel();
+        positionStreamSubscription = null;
+        print('GPS subscription cancelled');
+      }
+    }
+  }
+
+  void _processPositionUpdate(Position newPosition) {
+    // Save the accuracy for display
+    if (isSimulatedData) {
+      locationAccuracy = '(simulated 50 m)';
+    } else {
+      locationAccuracy = (newPosition.accuracy != null)
+          ? '${newPosition.accuracy.toStringAsFixed(0)} m'
+          : "unknown";
+    }
+    notifyListeners();
+    if (!isRunning) {
+      return;
+    }
     // Save previous position and speed
     Position previousPosition = newPosition;
     if (racePositions.length > 0) {
@@ -272,24 +299,42 @@ class RaceData extends ChangeNotifier {
         LatLng(newPosition.latitude, newPosition.longitude),
       ],
     );
-    // Add marker to map for this lap (note entry 0 in list is not used)
+    // If this is a new lap, add array element for lapMarkers and polyLines
     while (currentLapNumber > lapMarkers.length - 1) {
       lapMarkers.add({}); // Add an empty lapMarkers map for this lap
       polyLines.add({}); // Add empty polyLines map for this lap
     }
+    // If this is first entry on this lap, add the starting marker
+    if (lapMarkers[currentLapNumber].isEmpty) {
+      final startingMarker = Marker(
+        markerId: MarkerId('START'),
+        icon: BitmapDescriptor.defaultMarkerWithHue(180),
+        alpha: 1.0,
+        position: LatLng(startPosition.latitude, startPosition.longitude),
+        infoWindow: InfoWindow(title: 'L:$currentLapNumber START'),
+      );
+      lapMarkers[currentLapNumber]['START'] = startingMarker;
+    }
+    // Finally, add the new point
     lapMarkers[currentLapNumber][elapsedTimeString] = newMarker;
     polyLines[currentLapNumber][elapsedTimeString] = newPolyline;
+
     // Check for automatic lap crossings
     if (isAutoLapMark) {
-      checkLapCrossing(previousPosition, newPosition);
+      _checkLapCrossing(previousPosition, newPosition);
     }
+    notifyListeners();
   }
 
-  void checkLapCrossing(Position p1, Position p2) async {
+  void _checkLapCrossing(Position p1, Position p2) async {
     const double maxRange = 100.0; // Meters distance
     const double minRange = 10.0; // Meters distance
     // If this lap has just started, go no further
     if (lapMarkers[currentLapNumber].length < 10) {
+      return;
+    }
+    // If not moving, go no further
+    if (currentSpeedMph < 1) {
       return;
     }
     // Calculate distance from start point to previous and current point
@@ -309,7 +354,7 @@ class RaceData extends ChangeNotifier {
     }
     // If newest position is very near the start point, declare a new lap and return
     if (distanceToP2 < minRange) {
-      print('Lap completed by being in close range to starting point');
+      lastLapTrigger = 'proximity of ${distanceToP2.toStringAsFixed(0)} m';
       markLap();
       return;
     }
@@ -330,17 +375,14 @@ class RaceData extends ChangeNotifier {
     // Correct for angles > 180
     double correctedAngle = (rawAngle <= 180.0) ? rawAngle : 360.0 - rawAngle;
     if (correctedAngle > 90.0) {
-      print(
-          'Lap completed by bearing sweeping from $bearingToP1 to $bearingToP2');
+      lastLapTrigger =
+          'bearing swing of ${correctedAngle.toStringAsFixed(0)} deg';
       markLap();
     }
   }
 
   Future<void> _stop() async {
     isRunning = false; // This will stop the timer at the next tick
-    if (positionStreamSubscription != null) {
-      positionStreamSubscription.cancel();
-    }
     notifyListeners();
   }
 
@@ -367,7 +409,11 @@ class RaceData extends ChangeNotifier {
         majorAxis * x +
         majorAxis * 0.05 * Random().nextDouble();
     Position simPosition = Position(
-        latitude: lat, longitude: long, timestamp: DateTime.now(), speed: mps);
+      latitude: lat,
+      longitude: long,
+      timestamp: DateTime.now(),
+      speed: mps,
+    );
     return simPosition;
   }
 }

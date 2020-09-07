@@ -19,6 +19,20 @@ class _TabSettingsState extends State<TabSettings> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Text("Clear starting position", style: kSettingStyle),
+              RaisedButton(
+                child: Text('CLEAR'),
+                onPressed: () {
+                  myRaceData.clearStartingPosition();
+                },
+              )
+            ],
+          ),
+          MyDivider(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
               Text("Clear data", style: kSettingStyle),
               RaisedButton(
                 child: Text('CLEAR'),
@@ -136,23 +150,6 @@ class _TabSettingsState extends State<TabSettings> {
             ],
           ),
           MyDivider(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text("GPS: trigger on...         DISTANCE", style: kSettingStyle),
-              Switch(
-                value: myRaceData.isTimedUpdates,
-                onChanged: (bool newValue) {
-                  setState(() {
-                    myRaceData.setIsTimedUpdates(newValue);
-                  });
-                },
-              ),
-              Text("TIME", style: kSettingStyle),
-            ],
-          ),
-          //MyDivider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,

@@ -31,7 +31,7 @@ class _TabTimerState extends State<TabTimer> {
           backColor: Colors.yellow[700],
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
           child: RaisedButton(
             elevation: 10.0,
             shape: RoundedRectangleBorder(
@@ -58,6 +58,14 @@ class _TabTimerState extends State<TabTimer> {
             ),
           ),
         ),
+        Center(
+          child: Text(
+              'GPS accuracy: ${Provider.of<RaceData>(context).locationAccuracy}'),
+        ),
+        Center(
+          child: Text(
+              'Lap triggered by: ${Provider.of<RaceData>(context).lastLapTrigger}'),
+        ),
       ],
     );
   }
@@ -73,7 +81,7 @@ class BigTimer extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: 10.0,
-        vertical: 8.0,
+        vertical: 4.0,
       ),
       child: Stack(
         children: [
@@ -113,7 +121,7 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 4),
+      padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
