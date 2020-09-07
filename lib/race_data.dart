@@ -116,6 +116,7 @@ class RaceData extends ChangeNotifier {
   }
 
   void clearData() {
+    startPosition = null;
     racePositions = [];
     lapStats = [];
     lapMarkers = [{}, {}];
