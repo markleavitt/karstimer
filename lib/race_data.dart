@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -6,6 +7,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:karstimer/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:package_info/package_info.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:intl/intl.dart';
 
 // Create working instance of RaceData class for global use.
 RaceData myRaceData = RaceData();
@@ -115,7 +118,51 @@ class RaceData extends ChangeNotifier {
     startPosition = null;
   }
 
-  void clearData() {
+  void saveData(BuildContext context) async {
+    // Prepare current timestamp and get external directory path
+    final DateTime nowDate = DateTime.now();
+    final String formattedDate = DateFormat('yyyy-MM-dd–kk-mm').format(nowDate);
+    final externalDirectory = await getExternalStorageDirectory();
+
+    final raceDataFile =
+        File('${externalDirectory.path}/RaceData-$formattedDate.csv');
+    print('Saving RaceData to $raceDataFile');
+    String raceDataString = 'TimeStamp, Latitude, Longitude, Accuracy, Speed\n';
+    for (Position record in racePositions) {
+      raceDataString +=
+          '${record.timestamp}, ${record.latitude}, ${record.longitude}, ${record.accuracy}, ${record.speed}\n';
+    }
+    await raceDataFile.writeAsString(raceDataString);
+    //String raceDataReadBack = await raceDataFile.readAsString();
+
+    final lapDataFile =
+        File('${externalDirectory.path}/LapData-$formattedDate.csv');
+    print('Saving LapData to $lapDataFile');
+    String lapDataString = 'Lap Number, Lap Time, Top Speed (mph)\n';
+    for (_LapStats record in lapStats) {
+      lapDataString +=
+          '${record.lapNumber}, ${record.lapTime}, ${record.lapTopSpeed}\n';
+    }
+    await lapDataFile.writeAsString(lapDataString);
+    //String lapDataReadBack = await lapDataFile.readAsString();
+    // Clear existing data
+    eraseData();
+    // Display a message confirming data saved
+    final snackBar = SnackBar(
+      content: Center(
+        child: Text(
+          'Data Saved\n\nMemory Erased',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 32,
+          ),
+        ),
+      ),
+    );
+    Scaffold.of(context).showSnackBar(snackBar);
+  }
+
+  void eraseData() {
     startPosition = null;
     racePositions = [];
     lapStats = [];
@@ -262,7 +309,7 @@ class RaceData extends ChangeNotifier {
       position: LatLng(newPosition.latitude, newPosition.longitude),
       infoWindow: InfoWindow(
           title:
-              'L:$currentLapNumber ET: $elapsedTimeString Spd: ${(newPosition.speed * 2.237).toStringAsFixed(0)} mph'),
+              'L:$currentLapNumber ET: $elapsedTimeString Spd: ${(newPosition.speed * mpsToMph).toStringAsFixed(0)} mph'),
     );
     // Convert speed to mph and record top speed for this lap
     currentSpeedMph = newPosition.speed * mpsToMph;
@@ -413,6 +460,7 @@ class RaceData extends ChangeNotifier {
       latitude: lat,
       longitude: long,
       timestamp: DateTime.now(),
+      accuracy: 50,
       speed: mps,
     );
     return simPosition;

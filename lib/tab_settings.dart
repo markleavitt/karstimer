@@ -19,6 +19,20 @@ class _TabSettingsState extends State<TabSettings> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Text("Save data", style: kSettingStyle),
+              RaisedButton(
+                child: Text('SAVE'),
+                onPressed: () {
+                  myRaceData.saveData(context);
+                },
+              )
+            ],
+          ),
+          MyDivider(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
               Text("Clear starting position", style: kSettingStyle),
               RaisedButton(
                 child: Text('CLEAR'),
@@ -33,11 +47,11 @@ class _TabSettingsState extends State<TabSettings> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text("Clear data", style: kSettingStyle),
+              Text("Erase data", style: kSettingStyle),
               RaisedButton(
-                child: Text('CLEAR'),
+                child: Text('ERASE'),
                 onPressed: () {
-                  myRaceData.clearData();
+                  myRaceData.eraseData();
                 },
               )
             ],
