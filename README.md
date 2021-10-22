@@ -11,7 +11,7 @@ There are four screens (tabs):
 * Map: displays track positions on a map; click on a position n for speed/ET within lap; allows selection of which lap to display
 * Setup: many options, including clearing and erasing race data, saving race data to smartphone memory, turning automatic GPS-based lap marking on/off, activating a GPS simulator for testing without driving around, more...
 
-Before building the project, you must create your own Google Maps API Key, and insert it in >android>app>src>main>res>AndroidManifest.xml, line 20.
+Before building the project, you must create your own Google Maps API Key, and insert it in >android>app>src>main>AndroidManifest.xml, line 20.
 
 When installing, you must grant the app location permission.
 
